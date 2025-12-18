@@ -33,8 +33,6 @@ export class AddressController {
     return this.addressService.update(id, address, userId);
   }
 
-  //  DELETE
-  // DELETE /address/1
   @Delete(':id')
   delete(@Param('id') id: number) {
     return this.addressService.delete(id);
