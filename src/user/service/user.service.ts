@@ -1,9 +1,60 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { DeleteResult, Repository } from "typeorm"; 
 import { User } from "../entities/user.entity";
-import { Repository } from "typeorm";
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>
+    ) {}
+
+    async create(user: User): Promise<User> {
+        const buscaUsuario = await this.userRepository.findOne({ 
+            where: { email: user.email } 
+        });
+        
+        if (buscaUsuario) {
+            throw new HttpException('O Usuário (Email) já existe!', HttpStatus.BAD_REQUEST);
+        }
+
+        return await this.userRepository.save(user);
+    }
+
+    async findAll(): Promise<User[]> {
+        return await this.userRepository.find();
+    }
+
+    async findById(id: number): Promise<User> {
+        const buscaUsuario = await this.userRepository.findOne({
+            where: { id }
+        });
+
+        if (!buscaUsuario) {
+            throw new HttpException('Usuário não encontrado!', HttpStatus.NOT_FOUND);
+        }
+
+        return buscaUsuario;
+    }
+
+    async update(user: User): Promise<User> {
+        await this.findById(user.id);
+
+        const buscaUsuario = await this.userRepository.findOne({ 
+            where: { email: user.email } 
+        });
+
+        if (buscaUsuario && buscaUsuario.id !== user.id) {
+            throw new HttpException('Email já cadastrado para outro usuário!', HttpStatus.BAD_REQUEST);
+        }
+
+        return await this.userRepository.save(user);
+    }
+
+    async delete(id: number): Promise<DeleteResult> {
+        await this.findById(id);
+
+        return await this.userRepository.delete(id);
+    }
 }
