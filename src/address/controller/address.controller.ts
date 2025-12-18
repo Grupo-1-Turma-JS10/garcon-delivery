@@ -6,8 +6,6 @@ import { Address } from '../entities/address.entity';
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
-  //  CREATE
-  // POST /address?userId=1
   @Post()
   create(
     @Query('userId') userId: number,
