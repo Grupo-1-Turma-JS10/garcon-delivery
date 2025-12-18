@@ -6,6 +6,12 @@ import { User } from '../../user/entities/user.entity';
 
 @Injectable()
 export class AddressService {
+  delete(id: number) {
+    throw new Error('Method not implemented.');
+  }
+  findById(id: number) {
+    throw new Error('Method not implemented.');
+  }
 
   constructor(
     @InjectRepository(Address)
@@ -47,7 +53,7 @@ export class AddressService {
     return address;
   }
 
-  async update(id: number, address: Address): Promise<Address> {
+  async update(id: number, address: Address, userId: number): Promise<Address> {
     const existingAddress = await this.findOne(id);
     Object.assign(existingAddress, address);
     return this.addressRepository.save(existingAddress);
