@@ -24,8 +24,6 @@ export class AddressController {
     return this.addressService.findById(id);
   }
 
-  //  UPDATE
-  // PUT /address/1?userId=1
   @Put(':id')
   update(
     @Param('id') id: number,
