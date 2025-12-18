@@ -32,6 +32,25 @@ export class OrderItemService {
         return orderItem;
     }
 
+    async findByOrder(orderId: number): Promise<OrderItem[]> {
+
+        let orderItems = await this.orderItemRepository.find({
+            where: {
+                order: {
+                    id: orderId
+                }
+            },
+            relations:{
+                order: true,
+            }
+        });
+
+        if (!orderItems || orderItems.length === 0)
+            throw new HttpException('Itens de pedido não encontrados para o pedido informado!', HttpStatus.NOT_FOUND);
+
+        return orderItems;
+    }
+
     async create(orderItem: OrderItem): Promise<OrderItem> {
 
         //await this.orderService.findById(orderItem.order.id);
@@ -39,13 +58,13 @@ export class OrderItemService {
         return await this.orderItemRepository.save(orderItem);
     }
 
-    async update(orderItem: OrderItem): Promise<OrderItem> {
+    async update(id: number, orderItem: OrderItem): Promise<OrderItem> {
         
-        //await this.findById(order.id);
+        const  existingOrderItem = await this.findById(id);
 
         //await this.orderService.findById(order.orderItem.id);
         
-        return await this.orderItemRepository.save(orderItem);
+        return await this.orderItemRepository.save(existingOrderItem);
     }
 
     async delete(id: number): Promise<DeleteResult> {
