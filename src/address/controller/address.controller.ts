@@ -21,8 +21,6 @@ export class AddressController {
     return this.addressService.findAll();
   }
 
-  //  READ - por id
-  // GET /address/1
   @Get(':id')
   findById(@Param('id') id: number) {
     return this.addressService.findById(id);
