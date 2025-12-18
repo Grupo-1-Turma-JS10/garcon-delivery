@@ -9,4 +9,4 @@ import { Address } from "./entities/address.entity";
   controllers: [AddressController],
   providers: [AddressService],
 })
-export class CategoryModule {}
+export class AddressModule {}
