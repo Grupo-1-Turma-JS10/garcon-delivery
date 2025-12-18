@@ -14,8 +14,6 @@ export class AddressController {
     return this.addressService.create(address, userId);
   }
 
-  //  READ - todos
-  // GET /address
   @Get()
   findAll() {
     return this.addressService.findAll();
