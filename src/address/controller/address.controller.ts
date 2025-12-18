@@ -1,7 +1,9 @@
 import {Body,Controller,Delete,Get,Param,Post,Put,Query,} from '@nestjs/common';
 import { AddressService } from '../service/address.service';
 import { Address } from '../entities/address.entity';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('/Address')
 @Controller('address')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}

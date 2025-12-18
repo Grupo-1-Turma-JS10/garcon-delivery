@@ -1,11 +1,15 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Res } from '@nestjs/common';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import type { Response } from 'express';
 
 @Controller()
 export class AppController {
-  constructor() {}
+  constructor() { }
 
+  @ApiExcludeEndpoint()
   @Get()
-  getHello(): string {
-    return "Garçon Delivery!";
+  async redirect(@Res() resposta: Response) {
+    return resposta.redirect('/swagger');
   }
+
 }

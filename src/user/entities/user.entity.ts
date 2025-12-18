@@ -20,7 +20,6 @@ export class User {
     @Column({ length: 255, nullable: false })
     password: string;
  
-    @ApiProperty()
     @Column({ type: 'boolean', default: true })
     isActive: boolean;
  
