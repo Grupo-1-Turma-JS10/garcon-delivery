@@ -9,6 +9,7 @@ export class AppController {
   @ApiExcludeEndpoint()
   @Get()
   async redirect(@Res() resposta: Response) {
+    console.log('Redirecionando para /swagger');
     return resposta.redirect('/swagger');
   }
 
