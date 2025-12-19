@@ -1,9 +1,8 @@
-import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Order } from "../entities/order.entity";
-import { DeleteResult, In, Repository } from "typeorm";
+import { DeleteResult, Repository } from "typeorm";
 import { CreateOrderDto } from "../dto/create-order.dto";
-import { AddressService } from "../../address/service/address.service";
 import { UserService } from "../../user/service/user.service";
 import { UpdateOrderDto } from "../dto/update-order.dto";
 
@@ -12,20 +11,13 @@ export class OrderService {
     constructor(
         @InjectRepository(Order)
         private readonly orderRepository: Repository<Order>,
-        @Inject(AddressService)
-        private readonly addressService: AddressService,
-        @Inject(UserService)
         private readonly userService: UserService,
     ) { }
 
     async findAll(): Promise<Order[]> {
         return await this.orderRepository.find({
             relations: {
-                address: true,
                 user: true,
-                orderItems: {
-                    product: true
-                }
             }
         });
     }
@@ -37,11 +29,7 @@ export class OrderService {
                 id
             },
             relations: {
-                address: true,
                 user: true,
-                orderItems: {
-                    product: true
-                }
             }
         });
 
@@ -58,11 +46,7 @@ export class OrderService {
                 user: { id: userId }
             },
             relations: {
-                address: true,
                 user: true,
-                orderItems: {
-                    product: true
-                }
             }
         });
 
@@ -75,14 +59,11 @@ export class OrderService {
     async create(order: CreateOrderDto): Promise<Order> {
 
         try {
-            const address = await this.addressService.findOne(order.addressId);
             const user = await this.userService.findById(order.userId);
 
             const newOrder = this.orderRepository.create({
-                orderDate: order.orderDate || new Date(),
-                status: order.status,
-                user,
-                address
+                ...order,
+                user
             });
 
             return await this.orderRepository.save(newOrder);
@@ -97,10 +78,6 @@ export class OrderService {
     async update(id: number, order: UpdateOrderDto): Promise<Order> {
         try {
             await this.findById(id);
-
-            if (order.addressId) {
-                await this.addressService.findOne(order.addressId);
-            }
 
             const result = await this.orderRepository.update(id, order);
             if (result.affected === 0) {
@@ -122,9 +99,5 @@ export class OrderService {
 
         return await this.orderRepository.delete(id);
 
-    }
-
-    async updateTotalPrice(orderId: number, totalPrice: number): Promise<void> {
-        await this.orderRepository.update(orderId, { totalPrice });
     }
 }

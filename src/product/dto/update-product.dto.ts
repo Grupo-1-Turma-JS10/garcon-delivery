@@ -21,8 +21,9 @@ export class UpdateProductDto {
     @IsString()
     description?: string;
 
-    @ApiProperty({ example: 1, description: "Identifier of the category the product belongs to", required: false })
+    @ApiProperty({ example: "Pizza", description: "Category of the product", required: false })
     @IsOptional()
-    @IsNumber()
-    categoryId?: number;
+    @IsString()
+    @MinLength(2)
+    category?: string;
 }

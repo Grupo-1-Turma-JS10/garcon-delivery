@@ -1,10 +1,9 @@
 import { InjectRepository } from "@nestjs/typeorm";
-import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { Product } from "../entities/product.entity";
 import { DeleteResult, ILike, Repository } from "typeorm";
 import { CreateProductDto } from "../dto/create-product.dto";
 import { UpdateProductDto } from "../dto/update-product.dto";
-import { CategoryService } from "../../category/service/category.service";
 
 @Injectable()
 export class ProductService {
@@ -12,18 +11,12 @@ export class ProductService {
     constructor(
         @InjectRepository(Product)
         private readonly productRepository: Repository<Product>,
-        @Inject(CategoryService)
-        private readonly categoryService: CategoryService
     ) { }
 
 
     async findAll(): Promise<Product[]> {
 
-        return await this.productRepository.find({
-            relations: {
-                category: true,
-            },
-        });
+        return await this.productRepository.find();
     }
 
     async findById(id: number): Promise<Product> {
@@ -31,9 +24,6 @@ export class ProductService {
         const product = await this.productRepository.findOne({
             where: {
                 id,
-            },
-            relations: {
-                category: true,
             },
         });
 
@@ -50,9 +40,6 @@ export class ProductService {
             where: {
                 name: ILike(`%${name}%`)
             },
-            relations: {
-                category: true,
-            },
         });
     }
 
@@ -62,12 +49,7 @@ export class ProductService {
         try {
             const products: Product[] = await this.productRepository.find({
                 where: {
-                    category: {
-                        name: ILike(`%${category}%`)
-                    }
-                },
-                relations: {
-                    category: true,
+                    category: ILike(`%${category}%`)
                 },
             });
 
@@ -84,12 +66,7 @@ export class ProductService {
     async create(product: CreateProductDto): Promise<Product> {
 
         try {
-            const category = await this.categoryService.findById(product.categoryId);
-
-            const newProduct = this.productRepository.create({
-                ...product,
-                category
-            });
+            const newProduct = this.productRepository.create(product);
 
             return await this.productRepository.save(newProduct);
         } catch (error) {

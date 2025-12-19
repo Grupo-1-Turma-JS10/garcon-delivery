@@ -1,5 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Category } from "../../category/entities/category.entity";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 
 @Entity('tb_product')
@@ -19,6 +18,10 @@ export class Product {
     @ApiProperty({ example: "A fresh Cesar Salad with romaine lettuce, croutons, and parmesan cheese", description: "Description of the product" }) 
     @Column({ type: 'text', nullable: true })
     description?: string;
+
+    @ApiProperty({ example: "Salad", description: "Category of the product" })
+    @Column({ length: 50, nullable: false, default: 'Uncategorized' })
+    category: string;
  
     @ApiProperty({ example: "2023-01-01T00:00:00Z", description: "Date when the product was created" }) 
     @CreateDateColumn()
@@ -27,8 +30,4 @@ export class Product {
     @ApiProperty({ example: "2023-01-02T00:00:00Z", description: "Date when the product was last updated" }) 
     @UpdateDateColumn()
     updatedAt: Date;
- 
-    @ApiProperty() 
-    @ManyToOne(() => Category, category => category.products)
-    category: Category;
 }
