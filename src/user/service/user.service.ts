@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DeleteResult, Repository } from "typeorm"; 
 import { User } from "../entities/user.entity";
+import { CreateUserDto } from "../dto/create-user.dto";
+import { UpdateUserDto } from "../dto/update-user.dto";
 
 @Injectable()
 export class UserService {
@@ -10,7 +12,7 @@ export class UserService {
         private readonly userRepository: Repository<User>
     ) {}
 
-    async create(user: User): Promise<User> {
+    async create(user: CreateUserDto): Promise<User> {
         const buscaUsuario = await this.userRepository.findOne({ 
             where: { email: user.email } 
         });
@@ -38,14 +40,14 @@ export class UserService {
         return buscaUsuario;
     }
 
-    async update(user: User): Promise<User> {
-        await this.findById(user.id);
+    async update(id: number, user: UpdateUserDto): Promise<User> {
+        await this.findById(id);
 
         const buscaUsuario = await this.userRepository.findOne({ 
             where: { email: user.email } 
         });
 
-        if (buscaUsuario && buscaUsuario.id !== user.id) {
+        if (buscaUsuario && buscaUsuario.id !== id) {
             throw new HttpException('Email já cadastrado para outro usuário!', HttpStatus.BAD_REQUEST);
         }
 

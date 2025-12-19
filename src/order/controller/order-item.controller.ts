@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from 
 import { OrderItemService } from "../service/order-item.service";
 import { OrderItem } from "../entities/order-item.entity";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { CreateOrderItemDto } from "../dto/create-order-item.dto";
+import { UpdateOrderItemDto } from "../dto/update-order-item.dto";
 
 @ApiTags('OrderItem')
 @Controller('order-item')
@@ -11,7 +13,7 @@ export class OrderItemController {
     @Post()
     @ApiOperation({ summary: 'Create a new order item' })
     @ApiResponse({ status: 201, description: 'The order item has been successfully created.', type: OrderItem })
-    async create(@Body() orderItem: OrderItem) {
+    async create(@Body() orderItem: CreateOrderItemDto) {
         return await this.orderItemService.create(orderItem);
     }
 
@@ -39,7 +41,7 @@ export class OrderItemController {
     @Patch(':id')
     @ApiOperation({ summary: 'Update an existing order item' })
     @ApiResponse({ status: 200, description: 'The order item has been successfully updated.', type: OrderItem })
-    async update(@Param('id', ParseIntPipe) id: number, @Body() orderItem: OrderItem) {
+    async update(@Param('id', ParseIntPipe) id: number, @Body() orderItem: UpdateOrderItemDto) {
         return await this.orderItemService.update(id, orderItem);
     }
 

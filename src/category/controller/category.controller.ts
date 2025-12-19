@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { Category } from "../entities/category.entity";
 import { CategoryService } from "../service/category.service";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { CreateCategoryDto } from "../dto/create-category.dto";
 
 @ApiTags('Category')
 @Controller("/category")
@@ -12,7 +13,7 @@ export class CategoryController {
     @ApiOperation({ summary: 'Create a new category' })
     @ApiResponse({ status: 201, description: 'The category has been successfully created.', type: Category })
     @HttpCode(HttpStatus.CREATED)
-    create(@Body() category: Category): Promise<Category> {
+    create(@Body() category: CreateCategoryDto): Promise<Category> {
         return this.categoryService.create(category);
     }
 
@@ -40,12 +41,12 @@ export class CategoryController {
         return this.categoryService.findByName(name);
     }
 
-    @Put()
+    @Put('/:id')
     @ApiOperation({ summary: 'Update an existing category' })
     @ApiResponse({ status: 200, description: 'The category has been successfully updated.', type: Category })
     @HttpCode(HttpStatus.OK)
-    update(@Body() category: Category): Promise<Category> {
-        return this.categoryService.update(category);
+    update(@Param('id', ParseIntPipe) id: number, @Body() category: CreateCategoryDto): Promise<Category> {
+        return this.categoryService.update(id, category);
     }
 
     @Delete('/:id')

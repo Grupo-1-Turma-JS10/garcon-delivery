@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { OrderService } from "../service/order.service";
 import { Order } from "../entities/order.entity";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { CreateOrderDto } from "../dto/create-order.dto";
 
 @ApiTags('Order')
 @Controller('order')
@@ -28,7 +29,7 @@ export class OrderController {
     @ApiOperation({ summary: 'Create a new order' })
     @ApiResponse({ status: 201, description: 'The order has been successfully created.', type: Order })
     @HttpCode(HttpStatus.CREATED)
-    create(@Body() order: Order): Promise<Order> {
+    create(@Body() order: CreateOrderDto): Promise<Order> {
         return this.orderService.create(order);
     }
 

@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Order } from "../entities/order.entity";
 import { DeleteResult, Repository } from "typeorm";
+import { CreateOrderDto } from "../dto/create-order.dto";
 
 
 @Injectable()
@@ -35,7 +36,7 @@ export class OrderService {
         return order;
     }
 
-    async create(order: Order): Promise<Order> {
+    async create(order: CreateOrderDto): Promise<Order> {
 
         //await this.addressService.findById(order.address.id);
 

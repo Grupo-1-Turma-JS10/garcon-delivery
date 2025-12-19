@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DeleteResult, Repository } from "typeorm";
 import { OrderItem } from "../entities/order-item.entity";
+import { CreateOrderItemDto } from "../dto/create-order-item.dto";
+import { UpdateOrderItemDto } from "../dto/update-order-item.dto";
 
 @Injectable()
 export class OrderItemService {
@@ -51,14 +53,14 @@ export class OrderItemService {
         return orderItems;
     }
 
-    async create(orderItem: OrderItem): Promise<OrderItem> {
+    async create(orderItem: CreateOrderItemDto): Promise<OrderItem> {
 
         //await this.orderService.findById(orderItem.order.id);
 
         return await this.orderItemRepository.save(orderItem);
     }
 
-    async update(id: number, orderItem: OrderItem): Promise<OrderItem> {
+    async update(id: number, orderItem: UpdateOrderItemDto): Promise<OrderItem> {
         
         const  existingOrderItem = await this.findById(id);
 

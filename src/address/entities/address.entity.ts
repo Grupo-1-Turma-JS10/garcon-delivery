@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGenerate
 import { User } from "../../user/entities/user.entity";
 import { Order } from "../../order/entities/order.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 
 @Entity('tb_address')
 export class Address {
@@ -40,11 +41,11 @@ export class Address {
     @Column({ length: 100, nullable: true })
     complement?: string;
 
-    @ApiProperty({ type: () => User })
+    @Exclude()
     @ManyToOne(() => User, user => user.addresses)
     user: User;
     
-    @ApiProperty({ type: () => Order, isArray: true })
+    @Exclude()
     @OneToMany(() => Order, order => order.address)
     orders: Order[];
 }

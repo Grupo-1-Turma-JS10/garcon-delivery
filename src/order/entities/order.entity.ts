@@ -3,6 +3,7 @@ import { User } from "../../user/entities/user.entity";
 import { Address } from "../../address/entities/address.entity";
 import { OrderItem } from "./order-item.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 
 
 export enum OrderStatus {
@@ -40,20 +41,15 @@ export class Order {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ApiProperty({ example: 1, description: "Identifier of the user who placed the order" })
-    @ManyToOne(() => User, user => user.orders)
-    @Column({ type: 'int', nullable: false })
-    userId: number;
-
-    @ApiProperty({ type: () => Address })
+    @Exclude()
     @ManyToOne(() => Address, address => address.orders)
     address: Address;
 
-    @ApiProperty({ type: () => User })
+    @Exclude()
     @ManyToOne(() => User, user => user.orders)
     user: User;
 
-    @ApiProperty({ type: () => OrderItem, isArray: true })
+    @Exclude()
     @OneToMany(() => OrderItem, orderItem => orderItem.order)
     orderItems: OrderItem[];
 }

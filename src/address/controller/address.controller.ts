@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, } from '@nestjs
 import { AddressService } from '../service/address.service';
 import { Address } from '../entities/address.entity';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateAddressDto } from '../dto/create-address.dto';
+import { UpdateAddressDto } from '../dto/update-address.dto';
 
 @ApiTags('Address')
 @Controller('/address')
@@ -11,11 +13,8 @@ export class AddressController {
     @Post()
     @ApiOperation({ summary: 'Create a new address for a user' })
     @ApiResponse({ status: 201, description: 'The address has been successfully created.', type: Address })
-    create(
-        @Query('userId') userId: number,
-        @Body() address: Address,
-    ) {
-        return this.addressService.create(address, userId);
+    create(@Body() address: CreateAddressDto): Promise<Address> {
+        return this.addressService.create(address);
     }
 
     @Get()
@@ -35,12 +34,8 @@ export class AddressController {
     @Put(':id')
     @ApiOperation({ summary: 'Update an existing address' })
     @ApiResponse({ status: 200, description: 'The address has been successfully updated.', type: Address })
-    update(
-        @Param('id') id: number,
-        @Query('userId') userId: number,
-        @Body() address: Address,
-    ) {
-        return this.addressService.update(id, address, userId);
+    update(@Param('id') id: number, @Body() address: UpdateAddressDto): Promise<Address> {
+        return this.addressService.update(id, address);
     }
 
     @Delete(':id')
