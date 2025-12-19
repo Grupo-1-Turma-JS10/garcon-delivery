@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpCode, HttpStatus } from "@nestjs/common";
 import { OrderItemService } from "../service/order-item.service";
 import { OrderItem } from "../entities/order-item.entity";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -11,6 +11,7 @@ export class OrderItemController {
     constructor(private readonly orderItemService: OrderItemService) {}
 
     @Post()
+    @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Create a new order item' })
     @ApiResponse({ status: 201, description: 'The order item has been successfully created.', type: OrderItem })
     async create(@Body() orderItem: CreateOrderItemDto) {
@@ -18,6 +19,7 @@ export class OrderItemController {
     }
 
     @Get()
+    @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Retrieve all order items' })
     @ApiResponse({ status: 200, description: 'List of all order items', type: [OrderItem] })
     async findAll() {
@@ -25,6 +27,7 @@ export class OrderItemController {
     }
 
     @Get(':id')
+    @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Retrieve an order item by its ID' })
     @ApiResponse({ status: 200, description: 'The order item has been successfully retrieved.', type: OrderItem })
     async findOne(@Param('id') id: string) {
@@ -32,6 +35,7 @@ export class OrderItemController {
     }
 
     @Get('order/:orderId')
+    @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Retrieve order items by order ID' })
     @ApiResponse({ status: 200, description: 'List of order items for the specified order', type: [OrderItem] })
     async findByOrder(@Param('orderId') orderId: string) {
@@ -39,6 +43,7 @@ export class OrderItemController {
     }
 
     @Patch(':id')
+    @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Update an existing order item' })
     @ApiResponse({ status: 200, description: 'The order item has been successfully updated.', type: OrderItem })
     async update(@Param('id', ParseIntPipe) id: number, @Body() orderItem: UpdateOrderItemDto) {
@@ -46,6 +51,7 @@ export class OrderItemController {
     }
 
     @Delete(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Delete an order item by its ID' })
     @ApiResponse({ status: 204, description: 'The order item has been successfully deleted.' })
     async delete(@Param('id', ParseIntPipe) id: number) {

@@ -41,6 +41,10 @@ export class Address {
     @Column({ length: 100, nullable: true })
     complement?: string;
 
+    @ApiProperty({ example: 1, description: "Identifier of the user this address belongs to", required: false })
+    @Column({ type: 'int', nullable: true })
+    userId?: number;
+
     @Exclude()
     @ManyToOne(() => User, user => user.addresses)
     user: User;

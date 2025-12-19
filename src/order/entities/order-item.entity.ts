@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Order } from "./order.entity";
+import { Product } from "../../product/entities/product.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 
@@ -24,6 +25,10 @@ export class OrderItem {
     @ApiProperty({ example: "19.99", description: "Unit price of the product in the order item" })
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
     unitPrice: number;
+    
+    @ApiProperty()
+    @ManyToOne(() => Product)
+    product: Product;
     
     @Exclude()
     @ManyToOne(() => Order, order => order.orderItems)

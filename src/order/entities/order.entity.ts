@@ -21,7 +21,7 @@ export class Order {
     id: number;
 
     @ApiProperty({ example: "2023-01-01T00:00:00Z", description: "Date when the order was placed" })
-    @Column({ type: 'datetime', nullable: false })
+    @Column({ type: 'datetime', nullable: false, default: () => 'CURRENT_TIMESTAMP' })
     orderDate: Date;
 
     @ApiProperty({ example: "pendente", description: "Current status of the order" })
@@ -41,7 +41,10 @@ export class Order {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Exclude()
+    @ApiProperty({ example: 119.97, description: "Total price of the order" })
+    @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false, default: 0 })
+    totalPrice: number;
+
     @ManyToOne(() => Address, address => address.orders)
     address: Address;
 
@@ -49,7 +52,7 @@ export class Order {
     @ManyToOne(() => User, user => user.orders)
     user: User;
 
-    @Exclude()
+    @ApiProperty()
     @OneToMany(() => OrderItem, orderItem => orderItem.order)
     orderItems: OrderItem[];
 }

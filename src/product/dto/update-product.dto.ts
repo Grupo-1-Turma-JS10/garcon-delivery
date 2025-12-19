@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber, IsOptional, Min, MinLength } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateProductDto {
     @ApiProperty({ example: "Pizza Margherita", description: "Name of the product", required: false })
@@ -10,6 +11,7 @@ export class UpdateProductDto {
 
     @ApiProperty({ example: 19.99, description: "Price of the product", required: false })
     @IsOptional()
+    @Type(() => Number)
     @IsNumber()
     @Min(0)
     price?: number;

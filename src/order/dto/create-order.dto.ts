@@ -11,10 +11,10 @@ export enum OrderStatus {
 
 
 export class CreateOrderDto {
-    @ApiProperty({ example: "2023-10-01T12:00:00Z", description: "Date when the order was placed" })
-    @IsNotEmpty()
+    @ApiProperty({ example: "2023-10-01T12:00:00Z", description: "Date when the order was placed", required: false })
+    @IsOptional()
     @IsDate()
-    orderDate: Date;
+    orderDate?: Date;
 
     @ApiProperty({ example: 1, description: "Identifier of the user who placed the order" })
     @IsNotEmpty()
