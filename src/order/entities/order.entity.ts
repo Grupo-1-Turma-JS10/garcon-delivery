@@ -26,8 +26,8 @@ export class Order {
 
     @ApiProperty({ example: "pendente", description: "Current status of the order" })
     @Column({
-        type: 'enum',
-        enum: OrderStatus,
+        type: 'varchar',
+        length: 50,
         default: OrderStatus.PENDING,
         nullable: false,
     })
