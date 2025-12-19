@@ -1,11 +1,17 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DeleteResult, Repository } from "typeorm";
 import { OrderItem } from "../entities/order-item.entity";
+import { CreateOrderItemDto } from "../dto/create-order-item.dto";
+import { UpdateOrderItemDto } from "../dto/update-order-item.dto";
+import { OrderService } from "./order.service";
 
 @Injectable()
 export class OrderItemService {
-    constructor(@InjectRepository(OrderItem) private readonly orderItemRepository: Repository<OrderItem>) {}
+    constructor(
+        @InjectRepository(OrderItem) private readonly orderItemRepository: Repository<OrderItem>,
+        @Inject(OrderService) private readonly orderService: OrderService
+    ) {}
 
     async findAll(): Promise<OrderItem[]> {
         return await this.orderItemRepository.find({
@@ -51,14 +57,27 @@ export class OrderItemService {
         return orderItems;
     }
 
-    async create(orderItem: OrderItem): Promise<OrderItem> {
+    async create(orderItem: CreateOrderItemDto): Promise<OrderItem> {
 
-        //await this.orderService.findById(orderItem.order.id);
-
-        return await this.orderItemRepository.save(orderItem);
+        const newItem = await this.orderItemRepository.save(orderItem);
+        await this.updateOrderTotal(newItem.orderId);
+        
+        return newItem;
     }
 
-    async update(id: number, orderItem: OrderItem): Promise<OrderItem> {
+    private async updateOrderTotal(orderId: number): Promise<void> {
+        const items = await this.orderItemRepository.find({
+            where: { orderId }
+        });
+
+        const totalPrice = items.reduce((sum, item) => {
+            return sum + (Number(item.unitPrice) * item.quantity);
+        }, 0);
+
+        await this.orderService.updateTotalPrice(orderId, totalPrice);
+    }
+
+    async update(id: number, orderItem: UpdateOrderItemDto): Promise<OrderItem> {
         
         const  existingOrderItem = await this.findById(id);
 

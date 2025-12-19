@@ -1,12 +1,20 @@
 import { InjectRepository } from "@nestjs/typeorm";
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { Product } from "../entities/product.entity";
 import { DeleteResult, ILike, Repository } from "typeorm";
+import { CreateProductDto } from "../dto/create-product.dto";
+import { UpdateProductDto } from "../dto/update-product.dto";
+import { CategoryService } from "../../category/service/category.service";
 
 @Injectable()
 export class ProductService {
     private readonly logger = new Logger(ProductService.name);
-    constructor(@InjectRepository(Product) private readonly productRepository: Repository<Product>) { }
+    constructor(
+        @InjectRepository(Product)
+        private readonly productRepository: Repository<Product>,
+        @Inject(CategoryService)
+        private readonly categoryService: CategoryService
+    ) { }
 
 
     async findAll(): Promise<Product[]> {
@@ -73,21 +81,41 @@ export class ProductService {
 
     }
 
-    async create(product: Product): Promise<Product> {
-
-        return await this.productRepository.save(product)
-    }
-
-    async update(product: Product, id: number): Promise<Product> {
+    async create(product: CreateProductDto): Promise<Product> {
 
         try {
+            const category = await this.categoryService.findById(product.categoryId);
 
-            const updateProdutc = await this.findById(id);
-            return await this.productRepository.save(updateProdutc)
+            const newProduct = this.productRepository.create({
+                ...product,
+                category
+            });
+
+            return await this.productRepository.save(newProduct);
         } catch (error) {
-            if (error instanceof NotFoundException) { }
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Error creating product.');
         }
-        throw new InternalServerErrorException('Error updating post.');
+
+    }
+
+    async update(id: number, product: UpdateProductDto): Promise<Product> {
+
+        try {
+            const result = await this.productRepository.update(id, product);
+            if (result.affected === 0) {
+                throw new NotFoundException('Produto não encontrado');
+            }
+            
+            return this.findById(id);
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Error updating product.');
+        }
 
     }
 
