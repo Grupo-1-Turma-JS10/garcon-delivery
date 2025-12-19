@@ -21,8 +21,9 @@ export class CreateProductDto {
     @IsString()
     description?: string;
 
-    @ApiProperty({ example: 1, description: "Identifier of the category the product belongs to" })
+    @ApiProperty({ example: "Pizza", description: "Category of the product" })
     @IsNotEmpty()
-    @IsNumber()
-    categoryId: number;
+    @IsString()
+    @MinLength(2)
+    category: string;
 }

@@ -1,6 +1,5 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Order } from "../../order/entities/order.entity";
-import { Address } from "../../address/entities/address.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsStrongPassword } from "class-validator";
 import { Exclude } from "class-transformer";
@@ -35,10 +34,6 @@ export class User {
     @ApiProperty({ example: "2023-01-02T00:00:00Z", description: "Date when the user was last updated" })
     @UpdateDateColumn()
     updatedAt: Date;
-    
-    @Exclude()
-    @OneToMany(() => Address, address => address.user)
-    addresses: Address[];
  
     @Exclude()
     @OneToMany(() => Order, order => order.user)
