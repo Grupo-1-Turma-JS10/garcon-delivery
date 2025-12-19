@@ -6,6 +6,7 @@ import { ProdService } from './data/service/prod.service';
 import { AppController } from './app.controller';
 import { TestService } from './data/service/test.service';
 import { AddressModule } from './address/address.module';
+import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
@@ -21,6 +22,7 @@ import { UserModule } from './user/user.module';
       useClass: AppModule.getDatabaseService(),
       imports: [ConfigModule],
     }),
+    AuthModule,
     AddressModule,
     CategoryModule,
     OrderModule,

@@ -13,7 +13,7 @@ export class User {
   
     @ApiProperty({ example: "John Doe", description: "Name of the user" })
     @Column({ length: 100, nullable: false })
-    name: string;
+    username: string;
   
     @ApiProperty({ example: "email@email.com", description: "Email address of the user" })
     @Column({ length: 100, nullable: false, unique: true })
@@ -21,7 +21,7 @@ export class User {
 
     @Exclude()
     @IsStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })
-    @Column({ length: 30, nullable: false })
+    @Column({ length: 255, nullable: false })
     password: string;
  
     @ApiProperty({ example: true, description: "Indicates if the user is active" })

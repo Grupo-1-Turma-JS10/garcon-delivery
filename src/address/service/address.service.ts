@@ -2,7 +2,6 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Address } from '../entities/address.entity';
-import { User } from '../../user/entities/user.entity';
 import { CreateAddressDto } from '../dto/create-address.dto';
 import { UpdateAddressDto } from '../dto/update-address.dto';
 import { UserService } from '../../user/service/user.service';
@@ -26,7 +25,7 @@ export class AddressService {
             if (error instanceof NotFoundException) {
                 throw new NotFoundException('Usuário não encontrado para o endereço fornecido.');
             }
-            
+
             throw new NotFoundException('Erro ao criar o endereço: ' + error.message);
         }
     }
@@ -40,14 +39,22 @@ export class AddressService {
     async findOne(id: number): Promise<Address> {
         const address = await this.addressRepository.findOne({
             where: { id },
-            relations: ['user', 'orders'],
+            relations: {
+                user: true,
+                orders: true,
+            },
         });
 
         if (!address) {
-            throw new NotFoundException('Endereço não encontrado');
+            throw new NotFoundException(`Endereço com ID ${id} não encontrado.`);
         }
 
         return address;
+    }
+
+    async remove(id: number): Promise<void> {
+        const address = await this.findOne(id);
+        await this.addressRepository.remove(address);
     }
 
     async update(id: number, address: UpdateAddressDto): Promise<Address> {
