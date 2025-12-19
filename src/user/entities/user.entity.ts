@@ -4,11 +4,14 @@ import { Address } from "../../address/entities/address.entity";
 
 @Entity('tb_user')
 export class User {
+    senha(password: string, senha: any) {
+        throw new Error("Method not implemented.");
+    }
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ length: 100, nullable: false })
-    name: string;
+    username: string;
 
     @Column({ length: 100, nullable: false, unique: true })
     email: string;
