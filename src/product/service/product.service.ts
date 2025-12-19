@@ -1,6 +1,6 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import { Product } from "../entities/product.entity";
+import { categoryEnum, Product } from "../entities/product.entity";
 import { DeleteResult, ILike, Repository } from "typeorm";
 import { CreateProductDto } from "../dto/create-product.dto";
 import { UpdateProductDto } from "../dto/update-product.dto";
@@ -43,13 +43,13 @@ export class ProductService {
         });
     }
 
-    async findByCategory(category: string): Promise<Product[]> {
+    async findByCategory(category: categoryEnum): Promise<Product[]> {
         this.logger.log(`Finding products in category: ${category}`);
 
         try {
             const products: Product[] = await this.productRepository.find({
                 where: {
-                    category: ILike(`%${category}%`)
+                    category: category
                 },
             });
 

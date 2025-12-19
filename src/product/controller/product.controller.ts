@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ProductService } from "../service/product.service";
-import { Product } from "../entities/product.entity";
+import { categoryEnum, Product } from "../entities/product.entity";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateProductDto } from "../dto/create-product.dto";
 import { UpdateProductDto } from "../dto/update-product.dto";
@@ -34,7 +34,7 @@ export class ProductController {
     @ApiOperation({ summary: 'Retrieve products by category' })
     @ApiResponse({ status: 200, description: 'List of products for the specified category', type: [Product] })
     @HttpCode(HttpStatus.OK)
-    findByCategory(@Query('category') category: string): Promise<Product[]> {
+    findByCategory(@Query('category') category: categoryEnum): Promise<Product[]> {
         return this.productService.findByCategory(category);
     }
 
