@@ -70,6 +70,13 @@ describe('AppController (e2e)', () => {
       .expect(200)
   })
 
+  it('GET /user/all - Should not list users without token', async () => {
+    return request(app.getHttpServer())
+      .get('/user/all')
+      .send()
+      .expect(401);
+  });
+
   it("GET /user/:id - Should get user by ID", async () => {
     return request(app.getHttpServer())
       .get(`/user/${userId}`)
@@ -77,6 +84,13 @@ describe('AppController (e2e)', () => {
       .send()
       .expect(200)
   })
+
+  it('GET /user/:id - Should not get user by ID without token', async () => {
+    return request(app.getHttpServer())
+      .get(`/user/${userId}`)
+      .send()
+      .expect(401);
+  });
 
   it("PUT /user/:id - Should update a user", async () => {
     return request(app.getHttpServer())
@@ -90,4 +104,28 @@ describe('AppController (e2e)', () => {
         expect("Root Atualizado").toEqual(resposta.body.username);
       })
   })
+
+  it('PUT /user/:id - Should not update user without token', async () => {
+    return request(app.getHttpServer())
+      .put(`/user/${userId}`)
+      .send({
+        username: 'Root Atualizado',
+      })
+      .expect(401);
+  });
+
+  it("DELETE /user/:id - Should delete a user", async () => {
+    return request(app.getHttpServer())
+      .delete(`/user/${userId}`)
+      .set('Authorization', `${token}`)
+      .send()
+      .expect(204)
+  })
+
+  it('DELETE /user/:id - Should not delete user without token', async () => {
+    return request(app.getHttpServer())
+      .delete(`/user/${userId}`)
+      .send()
+      .expect(401);
+  });
 });
