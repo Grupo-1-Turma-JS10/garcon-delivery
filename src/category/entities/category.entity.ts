@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Product } from "../../product/entities/product.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 
 @Entity('tb_category')
 export class Category {
@@ -25,7 +26,7 @@ export class Category {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ApiProperty({ type: () => Product, isArray: true })
+    @Exclude()
     @OneToMany(() => Product, product => product.category)
     products: Product[];
 }

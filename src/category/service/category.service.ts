@@ -2,13 +2,14 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { DeleteResult, ILike, Repository } from "typeorm";
 import { Category } from "../entities/category.entity";
 import { InjectRepository } from "@nestjs/typeorm";
+import { CreateCategoryDto } from "../dto/create-category.dto";
 
 @Injectable()
 export class CategoryService {
     constructor(@InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>) {}
     
-    async create(category: Category): Promise<Category> {
+    async create(category: CreateCategoryDto): Promise<Category> {
         return await this.categoryRepository.save(category);
     }
    
@@ -45,10 +46,10 @@ export class CategoryService {
         });
     }
     
-    async update(category: Category): Promise<Category> {
-        let searchCategory = await this.findById(category.id);
+    async update(id: number, category: CreateCategoryDto): Promise<Category> {
+        let searchCategory = await this.findById(id);
 
-        if (!searchCategory || !category.id)
+        if (!searchCategory || !id)
             throw new HttpException('Category not found!', HttpStatus.NOT_FOUND);
 
         return await this.categoryRepository.save(category);

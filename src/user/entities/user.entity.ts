@@ -3,6 +3,7 @@ import { Order } from "../../order/entities/order.entity";
 import { Address } from "../../address/entities/address.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsStrongPassword } from "class-validator";
+import { Exclude } from "class-transformer";
 
 @Entity('tb_user')
 export class User {
@@ -18,7 +19,7 @@ export class User {
     @Column({ length: 100, nullable: false, unique: true })
     email: string;
 
-    @ApiProperty({ example: "strongPassword123", description: "Password of the user" })
+    @Exclude()
     @IsStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })
     @Column({ length: 30, nullable: false })
     password: string;
@@ -35,11 +36,11 @@ export class User {
     @UpdateDateColumn()
     updatedAt: Date;
     
-    @ApiProperty({ type: () => Address, isArray: true })
+    @Exclude()
     @OneToMany(() => Address, address => address.user)
     addresses: Address[];
  
-    @ApiProperty({ type: () => Order, isArray: true })
+    @Exclude()
     @OneToMany(() => Order, order => order.user)
     orders: Order[];
 }

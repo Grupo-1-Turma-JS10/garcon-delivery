@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Order } from "./order.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 
 @Entity('tb_order_item')
 export class OrderItem {
@@ -24,7 +25,7 @@ export class OrderItem {
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
     unitPrice: number;
     
-    @ApiProperty({ type: () => Order })
+    @Exclude()
     @ManyToOne(() => Order, order => order.orderItems)
     order: Order;
 }

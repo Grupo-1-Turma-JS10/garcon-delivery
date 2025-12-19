@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { UserService } from "../service/user.service";
 import { User } from "../entities/user.entity";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { CreateUserDto } from "../dto/create-user.dto";
+import { UpdateUserDto } from "../dto/update-user.dto";
 
 @ApiTags('User')
 @Controller('/user')
@@ -12,7 +14,7 @@ export class UserController {
     @ApiOperation({ summary: 'Register a new user' })
     @ApiResponse({ status: 201, description: 'The user has been successfully registered.', type: User })
     @HttpCode(HttpStatus.CREATED)
-    create(@Body() user: User): Promise<User> {
+    create(@Body() user: CreateUserDto): Promise<User> {
         return this.userService.create(user);
     }
 
@@ -32,12 +34,12 @@ export class UserController {
         return this.userService.findById(id);
     }
 
-    @Put('/update')
+    @Put('/:id')
     @ApiOperation({ summary: 'Update an existing user' })
     @ApiResponse({ status: 200, description: 'The user has been successfully updated.', type: User })
     @HttpCode(HttpStatus.OK)
-    update(@Body() user: User): Promise<User> {
-        return this.userService.update(user);
+    update(@Param('id', ParseIntPipe) id: number, @Body() user: UpdateUserDto): Promise<User> {
+        return this.userService.update(id, user);
     }
 
     @Delete('/:id')

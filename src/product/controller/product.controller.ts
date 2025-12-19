@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { ProductService } from "../service/product.service";
 import { Product } from "../entities/product.entity";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { CreateProductDto } from "../dto/create-product.dto";
+import { UpdateProductDto } from "../dto/update-product.dto";
 
 @ApiTags('Product')
 @Controller('/product')
@@ -12,7 +14,7 @@ export class ProductController {
     @ApiOperation({ summary: 'Create a new product' })
     @ApiResponse({ status: 201, description: 'The product has been successfully created.', type: Product })
     @HttpCode(HttpStatus.CREATED)
-    create(@Body() product: Product): Promise<Product> {
+    create(@Body() product: CreateProductDto): Promise<Product> {
         return this.productService.create(product);
     }
 
@@ -52,8 +54,8 @@ export class ProductController {
     @ApiOperation({ summary: 'Update an existing product' })
     @ApiResponse({ status: 200, description: 'The product has been successfully updated.', type: Product })
     @HttpCode(HttpStatus.OK)
-    update(@Param('id', ParseIntPipe) id: number, @Body() product: Product): Promise<Product> {
-        return this.productService.update(product, id);
+    update(@Param('id', ParseIntPipe) id: number, @Body() product: UpdateProductDto): Promise<Product> {
+        return this.productService.update(id, product);
     }
 
     @Delete('/:id')

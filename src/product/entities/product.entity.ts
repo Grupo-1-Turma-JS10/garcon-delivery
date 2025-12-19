@@ -28,7 +28,7 @@ export class Product {
     @UpdateDateColumn()
     updatedAt: Date;
  
-    @ApiProperty({ type: () => Category }) 
+    @ApiProperty() 
     @ManyToOne(() => Category, category => category.products)
     category: Category;
 }
