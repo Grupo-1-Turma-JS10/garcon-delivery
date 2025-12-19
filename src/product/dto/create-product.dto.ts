@@ -1,6 +1,7 @@
 import { IsString, IsNumber, IsOptional, Min, MinLength, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { categoryEnum } from '../entities/product.entity';
 
 export class CreateProductDto {
     @ApiProperty({ example: "Pizza Margherita", description: "Name of the product" })
@@ -25,5 +26,5 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsString()
     @MinLength(2)
-    category: string;
+    category: categoryEnum;
 }
