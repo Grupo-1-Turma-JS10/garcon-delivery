@@ -16,7 +16,7 @@ constructor(
 ) {}
 
 async validateUser(username: string, password: string): Promise<any> {
-    const buscaUsuario = await this.usuarioService.findByUsuario(username);
+    const buscaUsuario = await this.usuarioService.findByEmail(username);
 
     if (!buscaUsuario)
         throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
@@ -25,7 +25,7 @@ async validateUser(username: string, password: string): Promise<any> {
     }
     async login(usuarioLogin: UsuarioLogin) {
         const payload = {sub: usuarioLogin.usuario}
-        const buscaUsuario = await this.usuarioService.findByUsuario(
+        const buscaUsuario = await this.usuarioService.findByEmail(
             usuarioLogin.usuario,
         );
         return {

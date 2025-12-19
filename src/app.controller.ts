@@ -1,11 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
-  constructor() {}
+  constructor() { }
 
+  @ApiExcludeEndpoint()
   @Get()
-  getHello(): string {
-    return "Garçon Delivery!";
+  async root() {
+    return { message: 'API Garçon-Delivery', documentation: '/swagger' };
   }
+
 }
