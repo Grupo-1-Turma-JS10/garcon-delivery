@@ -1,39 +1,34 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Address } from '../entities/address.entity';
 import { User } from '../../user/entities/user.entity';
 import { CreateAddressDto } from '../dto/create-address.dto';
 import { UpdateAddressDto } from '../dto/update-address.dto';
+import { UserService } from '../../user/service/user.service';
 
 @Injectable()
 export class AddressService {
-    delete(id: number) {
-        throw new Error('Method not implemented.');
-    }
-    findById(id: number) {
-        throw new Error('Method not implemented.');
-    }
-
     constructor(
         @InjectRepository(Address)
         private addressRepository: Repository<Address>,
 
-        @InjectRepository(User)
-        private userRepository: Repository<User>,
+        @Inject(UserService)
+        private readonly userService: UserService,
     ) { }
 
     async create(address: CreateAddressDto): Promise<Address> {
-        const user = await this.userRepository.findOne({
-            where: { id: address.userId },
-        });
+        try {
+            await this.userService.findById(address.userId);
 
-        if (!user) {
-            throw new NotFoundException('Usuário não encontrado');
+            return this.addressRepository.save(address);
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw new NotFoundException('Usuário não encontrado para o endereço fornecido.');
+            }
+            
+            throw new NotFoundException('Erro ao criar o endereço: ' + error.message);
         }
-
-        address.userId = user.id;
-        return this.addressRepository.save(address);
     }
 
     async findAll(): Promise<Address[]> {
@@ -56,13 +51,12 @@ export class AddressService {
     }
 
     async update(id: number, address: UpdateAddressDto): Promise<Address> {
-        const existingAddress = await this.findOne(id);
-        Object.assign(existingAddress, address);
-        return this.addressRepository.save(existingAddress);
+        await this.addressRepository.update(id, address);
+        return this.findOne(id);
     }
 
-    async remove(id: number): Promise<void> {
+    async delete(id: number): Promise<void> {
         const address = await this.findOne(id);
-        await this.addressRepository.remove(address);
+        await this.addressRepository.delete(address.id);
     }
 }

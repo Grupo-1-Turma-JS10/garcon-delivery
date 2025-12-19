@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDate, IsString, IsNumber, IsOptional } from 'class-validator';
 
+export enum OrderStatus {
+    PENDING = 'pendente',
+    PREPARING = 'em_preparacao',
+    SHIPPED = 'enviado',
+    DELIVERED = 'entregue',
+    CANCELLED = 'cancelado',
+}
+
 export class UpdateOrderDto {
     @ApiProperty({ example: "2023-10-01T12:00:00Z", description: "Date when the order was placed", required: false })
     @IsOptional()
@@ -10,7 +18,7 @@ export class UpdateOrderDto {
     @ApiProperty({ example: "pendente", description: "Current status of the order", required: false })
     @IsOptional()
     @IsString()
-    status?: string;
+    status?: OrderStatus;
 
     @ApiProperty({ example: 1, description: "Identifier of the address for the order", required: false })
     @IsOptional()

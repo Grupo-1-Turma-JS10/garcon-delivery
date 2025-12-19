@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { DeleteResult, ILike, Repository } from "typeorm";
 import { Category } from "../entities/category.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -30,7 +30,7 @@ export class CategoryService {
         });
 
         if (!category)
-            throw new HttpException('Category not found!', HttpStatus.NOT_FOUND);
+            throw new NotFoundException('Category not found!');
 
         return category;
     }
