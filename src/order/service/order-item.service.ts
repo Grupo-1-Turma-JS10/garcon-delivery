@@ -79,11 +79,17 @@ export class OrderItemService {
 
     async update(id: number, orderItem: UpdateOrderItemDto): Promise<OrderItem> {
         
-        const  existingOrderItem = await this.findById(id);
+        const existingOrderItem = await this.findById(id);
 
-        //await this.orderService.findById(order.orderItem.id);
+        // Aplicar as mudanças do DTO ao objeto existente
+        Object.assign(existingOrderItem, orderItem);
         
-        return await this.orderItemRepository.save(existingOrderItem);
+        const updated = await this.orderItemRepository.save(existingOrderItem);
+        
+        // Atualizar total do pedido após a mudança
+        await this.updateOrderTotal(updated.orderId);
+        
+        return updated;
     }
 
     async delete(id: number): Promise<DeleteResult> {

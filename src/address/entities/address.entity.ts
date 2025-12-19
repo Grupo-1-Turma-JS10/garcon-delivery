@@ -16,6 +16,10 @@ export class Address {
     @ApiProperty({ example: "123", description: "Address number" }) 
     @Column({ length: 10, nullable: false })
     number: string;
+
+    @ApiProperty({ example: "Bairro Jardim", description: "Neighborhood of the address" }) 
+    @Column({ length: 50, nullable: false })
+    neighborhood: string;
     
     @ApiProperty({ example: "São Paulo", description: "City name of the address" }) 
     @Column({ length: 50, nullable: false })
