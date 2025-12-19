@@ -45,13 +45,13 @@ describe('AddressController (e2e)', () => {
 
   
   it('POST /address - deve criar um endereço', async () => {
-    console.log(token)
     const response = await request(app.getHttpServer())
       .post('/address')
       .set('Authorization', token)
       .send({
         street: 'Rua Teste',
         number: '123',
+        neighborhood: 'Centro',
         city: 'São Paulo',
         state: 'SP',
         zipCode: '01000-000',

@@ -21,7 +21,7 @@ export class Order {
     id: number;
 
     @ApiProperty({ example: "2023-01-01T00:00:00Z", description: "Date when the order was placed" })
-    @Column({ type: 'datetime', nullable: false, default: () => 'CURRENT_TIMESTAMP' })
+    @Column({ nullable: false, default: () => 'CURRENT_TIMESTAMP' })
     orderDate: Date;
 
     @ApiProperty({ example: "pendente", description: "Current status of the order" })
