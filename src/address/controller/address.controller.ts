@@ -41,7 +41,7 @@ export class AddressController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Update an existing address' })
     @ApiResponse({ status: 200, description: 'The address has been successfully updated.', type: Address })
-    update(@Param('id') id: number, @Body() address: UpdateAddressDto): Promise<Address> {
+    update(@Param('id', ParseIntPipe) id: number, @Body() address: UpdateAddressDto): Promise<Address> {
         return this.addressService.update(id, address);
     }
 
@@ -49,7 +49,7 @@ export class AddressController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Delete an address by its ID' })
     @ApiResponse({ status: 204, description: 'The address has been successfully deleted.' })
-    delete(@Param('id') id: number) {
+    delete(@Param('id', ParseIntPipe) id: number) {
         return this.addressService.delete(id);
     }
 }

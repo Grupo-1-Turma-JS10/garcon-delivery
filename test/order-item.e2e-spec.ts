@@ -3,7 +3,6 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { App } from "supertest/types";
 import { AppModule } from "../src/app.module";
 import request from 'supertest';
-import { Address } from "../src/address/entities/address.entity";
 
 describe('OrderItem (e2e)', () => {
     let token: string;
@@ -176,7 +175,8 @@ describe('OrderItem (e2e)', () => {
 
         expect(resposta.status).toBe(200);
         expect(resposta.body.quantity).toBe(3);
-        expect(resposta.body.unitPrice).toBe(17.99);
+        // PostgreSQL retorna decimal como string
+        expect(parseFloat(resposta.body.unitPrice)).toBe(17.99);
     });
 
     it('PUT /order-item/:id - Should not update order item without token', async () => {
