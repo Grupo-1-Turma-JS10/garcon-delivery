@@ -7,7 +7,7 @@ import { UpdateProductDto } from "../dto/update-product.dto";
 import { JwtAuthGuard } from "../../auth/guard/jwt-auth-guard";
 
 
-ApiBearerAuth()
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @ApiTags('Product')
 @Controller('/product')
