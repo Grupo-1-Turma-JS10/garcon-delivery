@@ -40,6 +40,7 @@ function swaggerSetup(app: INestApplication): void {
       "generation@email.com"
     )
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

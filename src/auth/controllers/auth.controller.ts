@@ -5,16 +5,17 @@ import { AuthService } from '../services/auth.service';
 import { UsuarioLogin } from '../entities/usuariologin.entity';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Usuario')
-@Controller("/usuarios")
+@UseGuards(LocalStrategy)
+@ApiTags('User')
+@Controller("/auth")
 export class AuthController {
     constructor(private authService: AuthService) { }
 
     @UseGuards(LocalAuthGuard)
     @HttpCode(HttpStatus.OK)
-    @Post('/logar')
-    login(@Body() usuario: UsuarioLogin): Promise<any> {
-        return this.authService.login(usuario);
+    @Post('/login')
+    login(@Body() userLogin: UsuarioLogin): Promise<any> {
+        return this.authService.login(userLogin);
     }
 
 }

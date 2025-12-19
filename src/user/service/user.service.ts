@@ -1,29 +1,43 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DeleteResult, Repository } from "typeorm";
 import { User } from "../entities/user.entity";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
 import { plainToClass } from "class-transformer";
+import { BcryptService } from "../../auth/bcrypt/bcrypt";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    @Inject(BcryptService)
+    private readonly bcrypt: BcryptService
   ) { }
 
   async create(user: CreateUserDto): Promise<User> {
-    const buscaUsuario = await this.userRepository.findOne({
-      where: { email: user.email }
-    });
+    try {
+      const existingUser = await this.userRepository.findOne({
+        where: { email: user.email }
+      });
 
-    if (buscaUsuario) {
-      throw new HttpException('O Usuário (Email) já existe!', HttpStatus.BAD_REQUEST);
+      if (existingUser) {
+        throw new BadRequestException(`User with email ${user.email} already exists`);
+      }
+
+      user.password = await this.bcrypt.hashPassword(user.password);
+
+      const newUser = this.userRepository.create(user);
+      const createdUser = await this.userRepository.save(newUser);
+      return createdUser;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Error creating user');
     }
-
-    const novoUsuario = await this.userRepository.save(user);
-    return plainToClass(User, novoUsuario);
   }
 
   async findAll(): Promise<User[]> {

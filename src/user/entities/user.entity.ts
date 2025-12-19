@@ -7,32 +7,21 @@ import { Exclude } from "class-transformer";
 
 @Entity('tb_user')
 export class User {
-<<<<<<< HEAD
-    senha(password: string, senha: any) {
-        throw new Error("Method not implemented.");
-    }
-=======
     @ApiProperty({ example: 1, description: "Unique identifier for the user" })
->>>>>>> main
     @PrimaryGeneratedColumn()
     id: number;
   
     @ApiProperty({ example: "John Doe", description: "Name of the user" })
     @Column({ length: 100, nullable: false })
-<<<<<<< HEAD
     username: string;
-
-=======
-    name: string;
   
     @ApiProperty({ example: "email@email.com", description: "Email address of the user" })
->>>>>>> main
     @Column({ length: 100, nullable: false, unique: true })
     email: string;
 
     @Exclude()
     @IsStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })
-    @Column({ length: 30, nullable: false })
+    @Column({ length: 255, nullable: false })
     password: string;
  
     @ApiProperty({ example: true, description: "Indicates if the user is active" })

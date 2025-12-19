@@ -1,35 +1,64 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { UserService } from "../../user/service/user.service";
 import { JwtService } from "@nestjs/jwt";
-import { Bcrypt } from "../bcrypt/bcrypt";
+import { BcryptService } from "../bcrypt/bcrypt";
 import { UsuarioLogin } from "../entities/usuariologin.entity";
-
-
-
+import { User } from "../../user/entities/user.entity";
 
 @Injectable()
 export class AuthService {
-constructor(
-    private usuarioService: UserService,
-    private jwtService: JwtService,
-    private bcrypt: Bcrypt,
-) {}
+    constructor(
+        private usuarioService: UserService,
+        private jwtService: JwtService,
+        private bcrypt: BcryptService,
+    ) { }
 
-async validateUser(username: string, password: string): Promise<any> {
-    const buscaUsuario = await this.usuarioService.findByEmail(username);
+    async validateUser(email: string, password: string): Promise<any> {
+        let user: User | null;
+        let passwordMatch: boolean;
 
-    if (!buscaUsuario)
-        throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
+        try {
+            user = await this.usuarioService.findByEmail(email);
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
 
-   
+            passwordMatch = await this.bcrypt.comparePassword(password, user.password);
+        } catch (error) {
+            error instanceof Error ? error.message : String(error);
+            throw new InternalServerErrorException('Error on validate user');
+        }
+
+        if (!user || !passwordMatch) {
+            throw new NotFoundException('Invalid credentials');
+        }
+
+        const userResponse = { ...user };
+        delete (userResponse as Partial<User>).password;
+        return userResponse;
+
     }
+
     async login(usuarioLogin: UsuarioLogin) {
-        const payload = {sub: usuarioLogin.usuario}
-        const buscaUsuario = await this.usuarioService.findByEmail(
-            usuarioLogin.usuario,
+        const user = await this.usuarioService.findByEmail(
+            usuarioLogin.email,
         );
-        return {
-            
-        };
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        try {
+            const payload = { id: user?.id, email: user?.email, username: user?.username };
+            const signedToken = this.jwtService.sign(payload);
+
+            return {
+                username: user?.username,
+                email: user?.email,
+                token: `Bearer ${signedToken}`,
+            };
+        } catch (error) {
+            throw new InternalServerErrorException('Error generating token');
+        }
     }
 }  

@@ -6,7 +6,7 @@ export class UpdateUserDto {
     @IsOptional()
     @IsString()
     @MinLength(3)
-    name?: string;
+    username?: string;
 
     @ApiProperty({ example: "john.doe@example.com", description: "Email address of the user", required: false })
     @IsOptional()

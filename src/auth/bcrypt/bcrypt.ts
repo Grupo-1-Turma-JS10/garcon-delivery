@@ -1,17 +1,25 @@
-import { Injectable } from "@nestjs/common";
-import { compare, hash} from "bcrypt";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { compare, hash } from "bcrypt";
 
 @Injectable()
-export class Bcrypt {
-    async criptografarSenha(senha: string): Promise<string> {
-        const saltos: number = 10;
-        return await hash(senha, saltos);
+export class BcryptService {
+    async hashPassword(password: string): Promise<string> {
+        try {
+            const saltRounds: number = 10;
+            return await hash(password, saltRounds);
+        } catch (error) {
+            throw new InternalServerErrorException('Error hashing password');
+        }
     }
 
-    async compararSenhas(
-        senhaDigitada: string, 
-        senhaBanco: string
+    async comparePassword(
+        typedPassword: string,
+        storedPassword: string
     ): Promise<boolean> {
-        return await compare(senhaDigitada, senhaBanco);
+        try {
+            return await compare(typedPassword, storedPassword);
+        } catch (error) {
+            throw new InternalServerErrorException('Error comparing passwords');
+        }
     }
 }
