@@ -20,8 +20,6 @@ const logger = new Logger('AuthModule');
             useFactory: (configService: ConfigService) => {
                 const jwtSecret = configService.get<string>('JWT_SECRET');
                 const jwtExpires = configService.get<string>('JWT_EXPIRES_IN') || '3h';
-                logger.log(`✅ JWT Secret loaded: ${jwtSecret ? 'YES (length: ' + jwtSecret.length + ')' : 'NO - EMPTY!'}`);
-                logger.log(`✅ JWT Expires: ${jwtExpires}`);
                 return {
                     secret: jwtSecret,
                     signOptions: {
