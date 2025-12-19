@@ -1,98 +1,224 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Garçon Delivery
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API de entrega em desenvolvimento com NestJS. Sistema completo para gerenciamento de usuários, produtos, pedidos e autenticação.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Descrição
 
-## Description
+Garçon Delivery é uma aplicação backend desenvolvida com **NestJS** e **TypeORM** que fornece uma API robusta para gerenciar:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- 👤 **Usuários** - Cadastro e gerenciamento de usuários
+- 🔐 **Autenticação** - Sistema JWT com estratégias Local e JWT
+- 🛍️ **Produtos** - Catálogo de produtos disponíveis
+- 📦 **Pedidos** - Sistema completo de pedidos
+- 🏬 **Gestão de dados** - Ambiente multi-base de dados (desenvolvimento, testes, produção)
 
-## Project setup
+## 🚀 Início Rápido
+
+### Pré-requisitos
+
+- Node.js 18+
+- npm ou yarn
+- Banco de dados (MySQL, PostgreSQL ou SQLite)
+
+### Instalação
 
 ```bash
-$ npm install
+# Clonar repositório
+git clone <seu-repositorio>
+cd garcon-delivery
+
+# Instalar dependências
+npm install
+
+# Configurar variáveis de ambiente
+cp .env.example .env
+
+# Configurar variáveis de ambiente para testes
+cp .env.test.example .env.test
+
+# Criar banco de dados
+npm run create-db
 ```
 
-## Compile and run the project
+### Configuração de Ambiente
+
+#### .env (Desenvolvimento/Produção)
+```env
+NODE_ENV=development
+DATABASE_TYPE=mysql
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_NAME=garcon_delivery
+DATABASE_USER=root
+DATABASE_PASSWORD=password
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=3h
+```
+
+#### .env.test (Testes)
+```env
+# Configurações do servidor
+PORT=3000
+
+# Configurações do ambiente
+NODE_ENV=test
+
+# Configurações do JWT
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=1h
+```
+
+### Execução
 
 ```bash
-# development
-$ npm run start
+# Modo desenvolvimento (com hot-reload)
+npm run start:dev
 
-# watch mode
-$ npm run start:dev
+# Modo produção
+npm run build
+npm run start:prod
 
-# production mode
-$ npm run start:prod
+# Debug
+npm run start:debug
 ```
 
-## Run tests
+## 🧪 Testes
 
 ```bash
-# unit tests
-$ npm run test
+# Testes unitários
+npm test
 
-# e2e tests
-$ npm run test:e2e
+# Testes com cobertura
+npm run test:cov
 
-# test coverage
-$ npm run test:cov
+# Testes em tempo real
+npm run test:watch
+
+# Testes E2E
+npm run test:e2e
 ```
 
-## Deployment
+## 📦 Estrutura do Projeto
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```
+src/
+├── auth/                 # Autenticação e estratégias
+│   ├── bcrypt/          # Criptografia de senhas
+│   ├── controllers/      # Controlador de auth
+│   ├── entities/         # Entidades de usuário login
+│   ├── guard/            # Guards JWT e Local
+│   ├── services/         # Lógica de autenticação
+│   └── strategy/         # Estratégias JWT e Local
+├── user/                 # Módulo de usuários
+│   ├── controller/
+│   ├── dto/              # Data Transfer Objects
+│   ├── entities/
+│   └── service/
+├── product/              # Módulo de produtos
+│   ├── controller/
+│   ├── dto/
+│   ├── entities/
+│   └── service/
+├── order/                # Módulo de pedidos
+│   ├── controller/
+│   ├── dto/
+│   ├── entities/
+│   └── service/
+├── data/                 # Serviços de ambiente
+│   └── service/          # Dev, Test, Prod
+├── app.controller.ts
+├── app.module.ts
+└── main.ts              # Ponto de entrada
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🔧 Tecnologias
 
-## Resources
+- **Framework**: NestJS
+- **ORM**: TypeORM
+- **Autenticação**: Passport.js (JWT + Local)
+- **Criptografia**: bcrypt
+- **Bancos de dados**: MySQL, PostgreSQL, SQLite
+- **Validação**: class-validator
+- **API Docs**: Swagger
+- **Testes**: Jest
+- **Linter**: ESLint + Prettier
 
-Check out a few resources that may come in handy when working with NestJS:
+## 📝 Scripts Disponíveis
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Comando | Descrição |
+|---------|-----------|
+| `npm run start` | Inicia a aplicação |
+| `npm run start:dev` | Inicia em modo desenvolvimento com hot-reload |
+| `npm run start:prod` | Inicia em produção |
+| `npm run build` | Faz build da aplicação |
+| `npm run create-db` | Cria banco de dados |
+| `npm test` | Executa testes unitários |
+| `npm run test:e2e` | Executa testes E2E |
+| `npm run lint` | Executa linter |
+| `npm run format` | Formata código com Prettier |
 
-## Support
+## 🔐 Autenticação
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+O sistema usa duas estratégias de autenticação:
 
-## Stay in touch
+### Local Strategy
+- Login com username/email e senha
+- Senhas criptografadas com bcrypt
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### JWT Strategy
+- Token JWT para requisições autenticadas
+- Validação via guards
 
-## License
+## 📚 Endpoints Principais
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Autenticação
+- `POST /auth/login` - Login
+- `POST /auth/register` - Registro
+
+### Usuários
+- `GET /user` - Listar usuários
+- `POST /user` - Criar usuário
+- `GET /user/:id` - Obter usuário
+- `PATCH /user/:id` - Atualizar usuário
+- `DELETE /user/:id` - Deletar usuário
+
+### Produtos
+- `GET /product` - Listar produtos
+- `POST /product` - Criar produto
+- `GET /product/:id` - Obter produto
+- `PATCH /product/:id` - Atualizar produto
+- `DELETE /product/:id` - Deletar produto
+
+### Pedidos
+- `GET /order` - Listar pedidos
+- `POST /order` - Criar pedido
+- `GET /order/:id` - Obter pedido
+- `PATCH /order/:id` - Atualizar pedido
+- `DELETE /order/:id` - Deletar pedido
+
+## 🤝 Contribuindo
+
+1. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+2. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+3. Push para a branch (`git push origin feature/AmazingFeature`)
+4. Abra um Pull Request
+
+## 📄 Licença
+
+UNLICENSED
+
+## 👨‍💻 Autor
+
+Desenvolvido por: 
+
+- Daniel RIbeiro Sacramento
+- Eduardo Pagel
+- Gabriela Lima
+- Joselaine Bechaire
+- Juliana Matsuda
+- Marcos Vinicius Pinto dos Santos
+- Michael Sales Figueredo
+
+---
+
+**Status**: Em Desenvolvimento 🚧
