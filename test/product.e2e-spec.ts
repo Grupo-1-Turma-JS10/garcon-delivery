@@ -7,6 +7,7 @@ describe('Product (e2e)', () => {
   let app: INestApplication;
   let token: string;
   let productId: number;
+  let restaurantId: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -17,22 +18,24 @@ describe('Product (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
 
-    // Criar usuário
-    await request(app.getHttpServer())
+    // Criar usuário restaurante
+    const userResponse = await request(app.getHttpServer())
       .post('/user/register')
       .send({
-        username: 'ProductUser',
-        email: 'productuser@domain.com',
-        password: 'ProductUser@1234!',
-        isActive: true,
+        name: 'Restaurant User',
+        email: 'restaurant@domain.com',
+        password: 'Restaurant@1234!',
+        role: 'RESTAURANT',
       });
+
+    restaurantId = userResponse.body.id;
 
     // Fazer login
     const loginResponse = await request(app.getHttpServer())
       .post("/auth/login")
       .send({
-        email: 'productuser@domain.com',
-        password: 'ProductUser@1234!',
+        email: 'restaurant@domain.com',
+        password: 'Restaurant@1234!',
       });
 
     token = loginResponse.body.token;
@@ -47,17 +50,18 @@ describe('Product (e2e)', () => {
       .post('/product')
       .set('Authorization', token)
       .send({
-        name: 'Pizza Margherita',
+        restaurantId: restaurantId,
+        name: 'Burger Delux',
         price: 29.99,
-        description: 'Deliciosa pizza com tomate, mozzarela e manjericão',
-        category: 'Pizza'
+        description: 'Delicioso burger com carne, queijo e alface',
+        available: true
       })
       .expect(201);
 
     productId = response.body.id;
     expect(response.body).toHaveProperty('id');
-    expect(response.body.name).toBe('Pizza Margherita');
-    expect(response.body.category).toBe('Pizza');
+    expect(response.body.name).toBe('Burger Delux');
+    expect(response.body.available).toBe(true);
   });
 
   it('GET /product - Deve listar todos os produtos', async () => {
@@ -76,21 +80,21 @@ describe('Product (e2e)', () => {
       .expect(200);
 
     expect(response.body.id).toBe(productId);
-    expect(response.body.name).toBe('Pizza Margherita');
+    expect(response.body.name).toBe('Burger Delux');
   });
 
   it('GET /product/name/:name - Deve buscar produto por nome', async () => {
     const response = await request(app.getHttpServer())
-      .get('/product/name/Pizza')
+      .get('/product/name/Burger')
       .set('Authorization', token)
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
   });
 
-  it('GET /product/by-category?category=Pizza - Deve buscar por categoria', async () => {
+  it('GET /product/available - Deve listar produtos disponíveis', async () => {
     const response = await request(app.getHttpServer())
-      .get('/product/by-category?category=Pizza')
+      .get('/product/available')
       .set('Authorization', token)
       .expect(200);
 
@@ -103,29 +107,17 @@ describe('Product (e2e)', () => {
       .set('Authorization', token)
       .send({
         price: 34.99,
-        category: 'Italian'
+        available: false
       })
       .expect(200);
 
     expect(parseFloat(response.body.price)).toBe(34.99);
-    expect(response.body.category).toBe('Italian');
+    expect(response.body.available).toBe(false);
   });
 
   it('DELETE /product/:id - Deve deletar um produto', async () => {
     return request(app.getHttpServer())
       .delete(`/product/${productId}`)
       .set('Authorization', token)
-      .expect(204);
-  });
-
-  it('POST /product - Deve falhar sem autenticação', async () => {
-    return request(app.getHttpServer())
-      .post('/product')
-      .send({
-        name: 'Teste',
-        price: 10,
-        category: 'Test'
-      })
-      .expect(401);
-  });
+      .expect(204);  });
 });

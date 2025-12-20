@@ -31,7 +31,7 @@ cd garcon-delivery
 npm install
 
 # Configurar variáveis de ambiente
-cp .env.example .env
+cp .env.example .env.development
 
 # Configurar variáveis de ambiente para testes
 cp .env.test.example .env.test

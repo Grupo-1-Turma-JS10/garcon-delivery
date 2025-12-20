@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
 import { ProductService } from "../service/product.service";
-import { categoryEnum, Product } from "../entities/product.entity";
+import { Product } from "../entities/product.entity";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateProductDto } from "../dto/create-product.dto";
 import { UpdateProductDto } from "../dto/update-product.dto";
@@ -30,12 +30,12 @@ export class ProductController {
         return this.productService.findAll();
     }
 
-    @Get('/by-category')
-    @ApiOperation({ summary: 'Retrieve products by category' })
-    @ApiResponse({ status: 200, description: 'List of products for the specified category', type: [Product] })
+    @Get('/restaurant/:restaurantId')
+    @ApiOperation({ summary: 'Retrieve products by restaurant' })
+    @ApiResponse({ status: 200, description: 'List of products for the specified restaurant', type: [Product] })
     @HttpCode(HttpStatus.OK)
-    findByCategory(@Query('category') category: categoryEnum): Promise<Product[]> {
-        return this.productService.findByCategory(category);
+    findByRestaurantId(@Param('restaurantId', ParseIntPipe) restaurantId: number): Promise<Product[]> {
+        return this.productService.findByRestaurantId(restaurantId);
     }
 
     @Get('/name/:name')
@@ -44,6 +44,14 @@ export class ProductController {
     @HttpCode(HttpStatus.OK)
     findByName(@Param('name') name: string): Promise<Product[]> {
         return this.productService.findByName(name);
+    }
+
+    @Get('/available')
+    @ApiOperation({ summary: 'Retrieve available products' })
+    @ApiResponse({ status: 200, description: 'List of available products', type: [Product] })
+    @HttpCode(HttpStatus.OK)
+    findAvailable(): Promise<Product[]> {
+        return this.productService.findAvailable();
     }
 
     @Get('/:id')

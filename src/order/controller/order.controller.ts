@@ -30,20 +30,37 @@ export class OrderController {
     }
 
     @Get('/user/:userId')
-    @ApiOperation({ summary: 'Retrieve orders by user ID' })
-    @ApiResponse({ status: 200, description: 'List of orders for the specified user', type: [Order] })
+    @ApiOperation({ summary: 'Retrieve orders by client ID' })
+    @ApiResponse({ status: 200, description: 'List of orders for the specified client', type: [Order] })
     @HttpCode(HttpStatus.OK)
-    findByUserId(@Param('userId', ParseIntPipe) userId: number): Promise<Order[]> {
-        return this.orderService.findByUserId(userId);
+    findByClientId(@Param('userId', ParseIntPipe) clientId: number): Promise<Order[]> {
+        return this.orderService.findByClientId(clientId);
     }
 
+    @Get('/restaurant/:restaurantId')
+    @ApiOperation({ summary: 'Retrieve orders by restaurant ID' })
+    @ApiResponse({ status: 200, description: 'List of orders for the specified restaurant', type: [Order] })
+    @HttpCode(HttpStatus.OK)
+    findByRestaurantId(@Param('restaurantId', ParseIntPipe) restaurantId: number): Promise<Order[]> {
+        return this.orderService.findByRestaurantId(restaurantId);
+    }
+
+    @Get('/status/:status')
+    @ApiOperation({ summary: 'Retrieve orders by status' })
+    @ApiResponse({ status: 200, description: 'List of orders with the specified status', type: [Order] })
+    @HttpCode(HttpStatus.OK)
+    findByStatus(@Param('status') status: string): Promise<Order[]> {
+        return this.orderService.findByStatus(status);
+    }
+    
     @Get('/:id')
     @ApiOperation({ summary: 'Retrieve an order by its ID' })
-    @ApiResponse({ status: 200, description: 'The order has been successfully retrieved.', type: Order })
+    @ApiResponse({ status: 200, description: 'The order with the specified ID', type: Order })
     @HttpCode(HttpStatus.OK)
     findById(@Param('id', ParseIntPipe) id: number): Promise<Order> {
         return this.orderService.findById(id);
     }
+
 
     @Put('/:id')
     @ApiOperation({ summary: 'Update an existing order' })

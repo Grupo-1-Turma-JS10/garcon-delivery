@@ -1,9 +1,10 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import { categoryEnum, Product } from "../entities/product.entity";
+import { Product } from "../entities/product.entity";
 import { DeleteResult, ILike, Repository } from "typeorm";
 import { CreateProductDto } from "../dto/create-product.dto";
 import { UpdateProductDto } from "../dto/update-product.dto";
+import { UserService } from "../../user/service/user.service";
 
 @Injectable()
 export class ProductService {
@@ -11,25 +12,27 @@ export class ProductService {
     constructor(
         @InjectRepository(Product)
         private readonly productRepository: Repository<Product>,
+        private readonly userService: UserService,
     ) { }
 
-
     async findAll(): Promise<Product[]> {
-
-        return await this.productRepository.find();
+        return await this.productRepository.find({
+            relations: {
+                restaurant: true,
+            }
+        });
     }
 
     async findById(id: number): Promise<Product> {
-
         const product = await this.productRepository.findOne({
-            where: {
-                id,
-            },
+            where: { id },
+            relations: {
+                restaurant: true,
+            }
         });
 
         if (!product) {
-            console.log("entrou aqui")
-            throw new HttpException('Produto não encontrado', HttpStatus.NOT_FOUND);
+            throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
         }
 
         return product;
@@ -40,60 +43,87 @@ export class ProductService {
             where: {
                 name: ILike(`%${name}%`)
             },
+            relations: {
+                restaurant: true,
+            }
         });
     }
 
-    async findByCategory(category: categoryEnum): Promise<Product[]> {
-        this.logger.log(`Finding products in category: ${category}`);
+    async findByRestaurantId(restaurantId: number): Promise<Product[]> {
+        this.logger.log(`Finding products for restaurant: ${restaurantId}`);
 
         try {
-            const products: Product[] = await this.productRepository.find({
+            const products = await this.productRepository.find({
                 where: {
-                    category: category
+                    restaurant: { id: restaurantId }
                 },
+                relations: {
+                    restaurant: true,
+                }
             });
 
-            if (products.length === 0) this.logger.warn(`No products found in category: ${category}`);
+            if (products.length === 0) 
+                this.logger.warn(`No products found for restaurant: ${restaurantId}`);
 
             return products;
         } catch (error) {
-            this.logger.error(`Error finding products in category: ${category}`, error.stack);
-            throw new InternalServerErrorException('Error retrieving products by category.');
+            this.logger.error(`Error finding products for restaurant: ${restaurantId}`, error.stack);
+            throw new InternalServerErrorException('Error retrieving products by restaurant.');
         }
-
     }
 
-    async create(product: CreateProductDto): Promise<Product> {
+    async findAvailable(): Promise<Product[]> {
+        return await this.productRepository.find({
+            where: {
+                available: true
+            },
+            relations: {
+                restaurant: true,
+            }
+        });
+    }
 
+    async create(dto: CreateProductDto): Promise<Product> {
         try {
-            const newProduct = this.productRepository.create(product);
+            const restaurant = await this.userService.findById(dto.restaurantId);
 
-            return await this.productRepository.save(newProduct);
+            const product = this.productRepository.create({
+                name: dto.name,
+                description: dto.description,
+                price: dto.price,
+                available: dto.available ?? true,
+                restaurant,
+            });
+
+            return await this.productRepository.save(product);
         } catch (error) {
-            if (error instanceof NotFoundException) {
+            if (error instanceof HttpException) {
                 throw error;
             }
-            throw new InternalServerErrorException('Error creating product.');
+            throw new InternalServerErrorException('Error creating product: ' + error.message);
         }
-
     }
 
-    async update(id: number, product: UpdateProductDto): Promise<Product> {
-
+    async update(id: number, dto: UpdateProductDto): Promise<Product> {
         try {
-            const result = await this.productRepository.update(id, product);
+            const result = await this.productRepository.update(id, {
+                name: dto.name,
+                description: dto.description,
+                price: dto.price,
+                available: dto.available,
+            });
+
             if (result.affected === 0) {
-                throw new NotFoundException('Produto não encontrado');
+                throw new NotFoundException('Product not found');
             }
-            
+
             return this.findById(id);
         } catch (error) {
-            if (error instanceof NotFoundException) {
+            if (error instanceof HttpException) {
                 throw error;
             }
-            throw new InternalServerErrorException('Error updating product.');
+            throw new InternalServerErrorException('Error updating product: ' + error.message);
         }
-
     }
 
     async delete(id: number): Promise<DeleteResult> {
