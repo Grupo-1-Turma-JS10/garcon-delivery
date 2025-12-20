@@ -1,11 +1,12 @@
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Order, OrderStatus } from "../entities/order.entity";
-import { DeleteResult, Repository } from "typeorm";
-import { CreateOrderDto } from "../dto/create-order.dto";
+import { Order, OrderItem, OrderStatus } from "../entities/order.entity";
+import { DeleteResult, Repository, UpdateResult } from "typeorm";
+import { CreateOrderDto, OrderItemDto } from "../dto/create-order.dto";
 import { UserService } from "../../user/service/user.service";
 import { UpdateOrderDto } from "../dto/update-order.dto";
 import { ProductService } from "../../product/service/product.service";
+import { User } from "../../user/entities/user.entity";
 
 @Injectable()
 export class OrderService {
@@ -27,7 +28,7 @@ export class OrderService {
     }
 
     async findById(id: number): Promise<Order> {
-        const order = await this.orderRepository.findOne({
+        const order: Order | null = await this.orderRepository.findOne({
             where: { id },
             relations: {
                 client: true,
@@ -42,7 +43,7 @@ export class OrderService {
     }
 
     async findByClientId(clientId: number): Promise<Order[]> {
-        const orders = await this.orderRepository.find({
+        const orders: Order[] = await this.orderRepository.find({
             where: {
                 client: { id: clientId }
             },
@@ -59,7 +60,7 @@ export class OrderService {
     }
 
     async findByRestaurantId(restaurantId: number): Promise<Order[]> {
-        const orders = await this.orderRepository.find({
+        const orders: Order[] = await this.orderRepository.find({
             where: {
                 restaurant: { id: restaurantId }
             },
@@ -97,46 +98,20 @@ export class OrderService {
 
     async create(dto: CreateOrderDto): Promise<Order> {
         this.logger.log(`Creating order for client ID: ${dto.clientId}`);
+
         try {
-            const client = await this.userService.findById(dto.clientId);
-            const restaurant = await this.userService.findById(dto.restaurantId);
+            const { client, restaurant } = await this.validateUsrerExists(dto.clientId, dto.restaurantId);
 
-            // Validar items e preencher com dados do banco
-            const validatedItems: { productId: number; name: string; price: number; quantity: number }[] = [];
-            let calculatedTotal = 0;
+            const validatedItems: OrderItem[] = await this.validateProductsInOrder(
+                dto.items, dto.restaurantId
+            );
+            const calculatedTotal: number = this.caulculateTotal(validatedItems);
 
-            for (const item of dto.items) {
-                const product = await this.productService.findById(item.productId);
-                
-                if (!product) {
-                    throw new BadRequestException(`Product with ID ${item.productId} not found`);
-                }
-
-                if (product.restaurant.id !== dto.restaurantId) {
-                    throw new BadRequestException(`Product ${item.productId} does not belong to the restaurant`);
-                }
-
-                if (!product.available) {
-                    throw new BadRequestException(`Product ${product.name} is not available`);
-                }
-
-                // Montar o item com informações do banco
-                const validatedItem = {
-                    productId: product.id,
-                    name: product.name,
-                    price: parseFloat(product.price.toString()),
-                    quantity: item.quantity,
-                };
-
-                validatedItems.push(validatedItem);
-                calculatedTotal += validatedItem.price * validatedItem.quantity;
-            }
-
-            const order = this.orderRepository.create({
+            const order: Order = this.orderRepository.create({
                 client,
                 restaurant,
                 items: validatedItems,
-                total: calculatedTotal,
+                total: parseFloat(calculatedTotal.toFixed(2)),
                 status: OrderStatus.CREATED,
             });
 
@@ -153,9 +128,8 @@ export class OrderService {
         try {
             await this.findById(id);
 
-            const result = await this.orderRepository.update(id, {
+            const result: UpdateResult = await this.orderRepository.update(id, {
                 items: dto.items,
-                total: dto.total,
                 status: dto.status,
             });
 
@@ -175,5 +149,68 @@ export class OrderService {
     async delete(id: number): Promise<DeleteResult> {
         await this.findById(id);
         return await this.orderRepository.delete(id);
+    }
+
+    async validateProductsInOrder(items: OrderItemDto[], restaurantId: number): Promise<OrderItem[]> {
+        this.logger.log(`Validating products for restaurant ID: ${restaurantId}`);
+
+        const validatedItems: OrderItem[] = [];
+
+        for (const item of items) {
+            const product = await this.productService.findById(item.productId);
+
+            if (!product) {
+                this.logger.error(`Product with ID ${item.productId} not found`);
+                throw new BadRequestException(`Product with ID ${item.productId} not found`);
+            }
+
+            if (product.restaurant.id !== restaurantId) {
+                this.logger.error(`Product ${item.productId} does not belong to the restaurant`);
+                throw new BadRequestException(`Product ${item.productId} does not belong to the restaurant`);
+            }
+
+            if (!product.available) {
+                this.logger.error(`Product ${product.name} is not available`);
+                throw new BadRequestException(`Product ${product.name} is not available`);
+            }
+
+            const validatedItem: OrderItem = {
+                productId: product.id,
+                name: product.name,
+                price: parseFloat(product.price.toString()),
+                quantity: item.quantity,
+                observations: item.observations,
+            };
+
+            validatedItems.push(validatedItem);
+        }
+
+        this.logger.log(`All products validated successfully for restaurant ID: ${restaurantId}`);
+        return validatedItems;
+    };
+
+    async validateUsrerExists(clientId: number, restaurantId: number): Promise<{ client: User; restaurant: User }> {
+        this.logger.log(`Validating existence of user ID: ${clientId}`);
+        
+        const client: User = await this.userService.findById(clientId);
+        const restaurant: User = await this.userService.findById(restaurantId);
+
+        if (!client) {
+            this.logger.error(`User with ID ${clientId} not found`);
+            throw new BadRequestException(`User with ID ${clientId} not found`);
+        }
+
+        if (!restaurant) {
+            this.logger.error(`User ${clientId} does not belong to the restaurant`);
+            throw new BadRequestException(`User ${clientId} does not belong to the restaurant`);
+        }
+
+        this.logger.log(`User ID: ${clientId} and Restaurant ID: ${restaurantId} validated successfully`);
+        return { client, restaurant };
+    }
+
+    caulculateTotal(items: OrderItem[]): number {
+        this.logger.log(`Calculating total for order with ${items.length} items`);
+        return items.reduce((total, item) => total + item.price * item.quantity, 0);
     }
 }

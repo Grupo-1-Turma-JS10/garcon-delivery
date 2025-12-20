@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber } from "class-validator";
@@ -16,6 +16,7 @@ export interface OrderItem {
     name: string;
     price: number;
     quantity: number;
+    observations?: string;
 }
 
 @Entity('orders')
@@ -63,4 +64,8 @@ export class Order {
     @ApiProperty({ example: "2023-01-01T00:00:00Z", description: "Date when the order was created" })
     @CreateDateColumn()
     createdAt: Date;
+
+    @ApiProperty({ example: "2023-01-01T01:00:00Z", description: "Date when the order was last updated" })
+    @UpdateDateColumn()
+    updatedAt: Date;
 }
