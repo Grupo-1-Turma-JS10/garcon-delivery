@@ -1,67 +1,41 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export enum OrderStatus {
-    PENDING = 'pendente',
-    PREPARING = 'em_preparacao',
-    SHIPPED = 'enviado',
-    DELIVERED = 'entregue',
-    CANCELLED = 'cancelado',
-}
-
-
-export class CreateOrderDto {
-    @ApiProperty({ example: "2023-10-01T12:00:00Z", description: "Date when the order was placed", required: false })
-    @IsOptional()
-    @IsDate()
-    orderDate?: Date;
-
-    @ApiProperty({ example: 1, description: "Identifier of the user who placed the order" })
+export class OrderItemDto {
+    @ApiProperty({ example: 1, description: "Product ID" })
     @IsNotEmpty()
     @IsNumber()
-    userId: number;
+    productId: number;
 
-    @ApiProperty({ example: "Rua das Flores", description: "Street name of the delivery address" })
+    @ApiProperty({ example: 2, description: "Quantity" })
     @IsNotEmpty()
-    @IsString()
-    @MinLength(3)
-    street: string;
-
-    @ApiProperty({ example: "123", description: "Number of the delivery address" })
-    @IsNotEmpty()
-    @IsString()
-    number: string;
-
-    @ApiProperty({ example: "Bairro Jardim", description: "Neighborhood of the delivery address" })
-    @IsNotEmpty()
-    @IsString()
-    @MinLength(3)
-    neighborhood: string;
-
-    @ApiProperty({ example: "São Paulo", description: "City of the delivery address" })
-    @IsNotEmpty()
-    @IsString()
-    @MinLength(2)
-    city: string;
-
-    @ApiProperty({ example: "SP", description: "State of the delivery address" })
-    @IsNotEmpty()
-    @IsString()
-    @MinLength(2)
-    state: string;
-
-    @ApiProperty({ example: "01001-000", description: "Postal code of the delivery address" })
-    @IsNotEmpty()
-    @IsString()
-    zipCode: string;
-
-    @ApiProperty({ example: "Apto 101", description: "Additional delivery address information", required: false })
-    @IsOptional()
-    @IsString()
-    complement?: string;
-
-    @ApiProperty({ example: "pendente", description: "Current status of the order", required: false })
-    @IsOptional()
-    @IsString()
-    status?: OrderStatus;
+    @IsNumber()
+    quantity: number;
 }
+
+export class CreateOrderDto {
+    @ApiProperty({ example: 1, description: "Client user ID" })
+    @IsNotEmpty()
+    @IsNumber()
+    clientId: number;
+
+    @ApiProperty({ example: 2, description: "Restaurant user ID" })
+    @IsNotEmpty()
+    @IsNumber()
+    restaurantId: number;
+
+    @ApiProperty({
+        example: [
+            { productId: 1, quantity: 2 },
+            { productId: 2, quantity: 2 },
+        ],
+        description: "Order items",
+    })
+    @IsNotEmpty()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => OrderItemDto)
+    items: OrderItemDto[];
+}
+

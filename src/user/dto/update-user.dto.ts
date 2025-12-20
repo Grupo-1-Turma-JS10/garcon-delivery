@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, MinLength, IsOptional, IsStrongPassword } from 'class-validator';
+import { IsString, IsEmail, MinLength, IsOptional } from 'class-validator';
 
 export class UpdateUserDto {
     @ApiProperty({ example: "John Doe", description: "Name of the user", required: false })
@@ -13,13 +13,8 @@ export class UpdateUserDto {
     @IsEmail()
     email?: string;
 
-    @ApiProperty({ example: "strongPassword123", description: "Password of the user", required: false })
+    @ApiProperty({ example: "Rua das Flores, 123, São Paulo, SP", description: "Address of the user", required: false })
     @IsOptional()
     @IsString()
-    @IsStrongPassword()
-    password?: string;
-    
-    @ApiProperty({ example: true, description: "Indicates if the user is active", required: false })
-    @IsOptional()
-    isActive?: boolean;
+    address?: string;
 }

@@ -27,10 +27,10 @@ describe('AppController (e2e)', () => {
     const resposta = await request(app.getHttpServer())
       .post('/user/register')
       .send({
-        username: 'Root',
+        name: 'Root User',
         email: 'root@root.com',
         password: 'Root@1234!',
-        isActive: true,
+        role: 'CLIENT',
       })
       .expect(201)
 
@@ -41,10 +41,10 @@ describe('AppController (e2e)', () => {
     await request(app.getHttpServer())
       .post('/user/register')
       .send({
-        username: 'Root',
+        name: 'Root User',
         email: 'root@root.com',
         password: 'Root@1234!',
-        isActive: true,
+        role: 'CLIENT',
       })
       .expect(400)
 
@@ -97,11 +97,11 @@ describe('AppController (e2e)', () => {
       .put(`/user/${userId}`)
       .set('Authorization', `${token}`)
       .send({
-        username: 'Root Atualizado',
+        name: 'Root User Updated',
       })
       .expect(200)
       .then(resposta => {
-        expect("Root Atualizado").toEqual(resposta.body.username);
+        expect("Root User Updated").toEqual(resposta.body.name);
       })
   })
 

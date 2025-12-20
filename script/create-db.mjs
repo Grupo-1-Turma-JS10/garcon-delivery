@@ -1,7 +1,7 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: '.env.development' });
 
 const dbName = process.env.DB_DATABASE;
 const dbHost = process.env.DB_HOST || 'localhost';

@@ -2,13 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { OrderStatus } from '../src/order/dto/create-order.dto';
+import { OrderStatus } from './../src/order/entities/order.entity';
 
 describe('Order System (e2e)', () => {
   let app: INestApplication;
   let token: string;
-  let userId: number;
+  let clientId: number;
+  let restaurantId: number;
   let orderId: number;
+  let productIds: number[] = [];
 
   beforeAll(async () => {
 
@@ -20,27 +22,63 @@ describe('Order System (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
 
-    // Criar usuário
-    const registerResponse = await request(app.getHttpServer())
+    // Criar usuário cliente
+    const clientRegisterResponse = await request(app.getHttpServer())
       .post('/user/register')
       .send({
-        username: 'OrderUser',
-        email: 'orderuser@domain.com',
-        password: 'OrderUser@1234!',
-        isActive: true,
+        name: 'Order Client',
+        email: 'client@domain.com',
+        password: 'Client@1234!',
+        role: 'CLIENT',
       });
 
-    userId = registerResponse.body.id;
+    clientId = clientRegisterResponse.body.id;
 
-    // Fazer login
+    // Criar usuário restaurante
+    const restaurantRegisterResponse = await request(app.getHttpServer())
+      .post('/user/register')
+      .send({
+        name: 'Order Restaurant',
+        email: 'restaurant@domain.com',
+        password: 'Restaurant@1234!',
+        role: 'RESTAURANT',
+      });
+
+    restaurantId = restaurantRegisterResponse.body.id;
+
+    // Fazer login como cliente
     const loginResponse = await request(app.getHttpServer())
       .post("/auth/login")
       .send({
-        email: 'orderuser@domain.com',
-        password: 'OrderUser@1234!',
+        email: 'client@domain.com',
+        password: 'Client@1234!',
       });
 
     token = loginResponse.body.token;
+
+    // Criar alguns produtos para usar nos testes (como restaurante)
+    const restaurantLoginResponse = await request(app.getHttpServer())
+      .post("/auth/login")
+      .send({
+        email: 'restaurant@domain.com',
+        password: 'Restaurant@1234!',
+      });
+
+    const restaurantToken = restaurantLoginResponse.body.token;
+
+    for (let i = 1; i <= 3; i++) {
+      const productResponse = await request(app.getHttpServer())
+        .post('/product')
+        .set('Authorization', restaurantToken)
+        .send({
+          restaurantId: restaurantId,
+          name: `Product ${i}`,
+          price: 10 * i,
+          description: `Description for product ${i}`,
+          available: true
+        });
+      productIds.push(productResponse.body.id);
+    }
   });
 
   afterAll(async () => {
@@ -48,44 +86,91 @@ describe('Order System (e2e)', () => {
   });
 
   describe('Order Flow', () => {
-    it('POST /order - Deve criar um pedido', async () => {
+    it('POST /order - Deve criar um pedido com um produto', async () => {
       const response = await request(app.getHttpServer())
         .post('/order')
         .set('Authorization', token)
         .send({
-          userId: userId,
-          street: 'Rua das Flores',
-          number: '123',
-          neighborhood: 'Vila Mariana',
-          city: 'São Paulo',
-          state: 'SP',
-          zipCode: '01435-010',
-          complement: 'Apto 302',
-          status: OrderStatus.PENDING
+          clientId: clientId,
+          restaurantId: restaurantId,
+          items: [
+            { productId: productIds[0], quantity: 1 }
+          ]
         })
         .expect(201);
 
       orderId = response.body.id;
       expect(response.body).toHaveProperty('id');
-      expect(response.body.street).toBe('Rua das Flores');
-      expect(response.body.city).toBe('São Paulo');
+      expect(response.body.items).toBeDefined();
+      expect(response.body.items.length).toBe(1);
+      expect(response.body.items[0].name).toBe('Product 1');
+      expect(response.body.items[0].price).toBe(10);
+      expect(response.body.total).toBe(10);
     });
 
-    it('GET /order - Deve listar pedidos', async () => {
-      return request(app.getHttpServer())
+    it('POST /order - Deve criar um pedido com produtos', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/order')
+        .set('Authorization', token)
+        .send({
+          clientId: clientId,
+          restaurantId: restaurantId,
+          items: [
+            { productId: productIds[0], quantity: 1 },
+            { productId: productIds[1], quantity: 1 }
+          ]
+        })
+        .expect(201);
+
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.items).toBeDefined();
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items.length).toBe(2);
+      expect(parseFloat(response.body.total)).toBe(30.00);
+    });
+
+    it('POST /order - Deve criar outro pedido com 3 produtos', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/order')
+        .set('Authorization', token)
+        .send({
+          clientId: clientId,
+          restaurantId: restaurantId,
+          items: [
+            { productId: productIds[0], quantity: 1 },
+            { productId: productIds[1], quantity: 1 },
+            { productId: productIds[2], quantity: 1 }
+          ]
+        })
+        .expect(201);
+
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.items).toBeDefined();
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items.length).toBe(3);
+      expect(parseFloat(response.body.total)).toBe(60.00);
+    });
+
+    it('GET /order - Deve listar pedidos com produtos carregados', async () => {
+      const response = await request(app.getHttpServer())
         .get('/order')
         .set('Authorization', token)
         .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
     });
 
-    it('GET /order/:id - Deve buscar pedido por ID', async () => {
+    it('GET /order/:id - Deve buscar pedido por ID com produtos carregados', async () => {
+      // Pegar o primeiro pedido
       const response = await request(app.getHttpServer())
         .get(`/order/${orderId}`)
         .set('Authorization', token)
         .expect(200);
 
       expect(response.body.id).toBe(orderId);
-      expect(response.body.street).toBe('Rua das Flores');
+      expect(response.body.items).toBeDefined();
+      expect(Array.isArray(response.body.items)).toBe(true);
     });
 
     it('PUT /order/:id - Deve atualizar um pedido', async () => {
@@ -93,18 +178,31 @@ describe('Order System (e2e)', () => {
         .put(`/order/${orderId}`)
         .set('Authorization', token)
         .send({
-          city: 'Rio de Janeiro',
-          status: OrderStatus.PREPARING
+          status: OrderStatus.CONFIRMED
         })
         .expect(200);
 
-      expect(response.body.city).toBe('Rio de Janeiro');
-      expect(response.body.status).toBe(OrderStatus.PREPARING);
+      expect(response.body.status).toBe(OrderStatus.CONFIRMED);
     });
 
     it('DELETE /order/:id - Deve deletar um pedido', async () => {
+      // Criar um order novo para deletar
+      const response = await request(app.getHttpServer())
+        .post('/order')
+        .set('Authorization', token)
+        .send({
+          clientId: clientId,
+          restaurantId: restaurantId,
+          items: [
+            { productId: productIds[0], name: 'Product 1', price: 10, quantity: 1 }
+          ],
+          total: 10
+        });
+
+      const orderToDelete = response.body.id;
+
       return request(app.getHttpServer())
-        .delete(`/order/${orderId}`)
+        .delete(`/order/${orderToDelete}`)
         .set('Authorization', token)
         .expect(204);
     });
