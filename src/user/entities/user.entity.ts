@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 
@@ -16,6 +16,10 @@ export class User {
     @ApiProperty({ example: "John Doe", description: "Name of the user" })
     @Column({ length: 100, nullable: false })
     name: string;
+
+    @ApiProperty({ example: "12345678900", description: "Document number of the user. CPF or CNPJ" })
+    @Column({ length: 20, nullable: false, unique: true })
+    document: string;
   
     @ApiProperty({ example: "email@email.com", description: "Email address of the user" })
     @Column({ length: 100, nullable: false, unique: true })
@@ -49,4 +53,8 @@ export class User {
     @ApiProperty({ example: "2023-01-01T00:00:00Z", description: "Date when the user was created" })
     @CreateDateColumn()
     createdAt: Date;
+
+    @ApiProperty({ example: "2023-01-01T01:00:00Z", description: "Date when the user was last updated" })
+    @UpdateDateColumn()
+    updatedAt: Date;
 }

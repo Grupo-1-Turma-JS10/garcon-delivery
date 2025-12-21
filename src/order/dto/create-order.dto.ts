@@ -15,7 +15,6 @@ export class OrderItemDto {
 
     @ApiProperty({ example: "Please deliver to the back door.", description: "Additional observations for the order", required: false })
     @IsOptional()
-    @IsNotEmpty()
     @IsString()
     observations?: string;
 }
