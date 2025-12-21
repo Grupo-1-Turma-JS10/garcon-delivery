@@ -42,7 +42,7 @@ npm run create-db
 
 ### Configuração de Ambiente
 
-#### .env (Desenvolvimento/Produção)
+#### .env (Desenvolvimento)
 ```env
 NODE_ENV=development
 DATABASE_TYPE=mysql
@@ -131,7 +131,68 @@ src/
 └── main.ts              # Ponto de entrada
 ```
 
-## 🔧 Tecnologias
+## � Entidades do Sistema
+
+### User
+A entidade User representa tanto clientes quanto restaurantes na plataforma.
+
+**Campos:**
+- `id` (number): Identificador único
+- `name` (string, até 100 caracteres): Nome do usuário
+- `document` (string, até 20 caracteres): CPF ou CNPJ - único
+- `email` (string, até 100 caracteres): Email - único
+- `password` (string, até 255 caracteres): Senha criptografada
+- `role` (enum: CLIENT | RESTAURANT): Tipo de usuário (padrão: CLIENT)
+- `address` (string, até 255 caracteres): Endereço (opcional)
+- `createdAt` (Date): Data de criação
+- `updatedAt` (Date): Data de última atualização
+
+### Product
+Produtos oferecidos pelos restaurantes.
+
+**Campos:**
+- `id` (number): Identificador único
+- `restaurant` (User): Restaurante que oferece o produto (relacionamento ManyToOne)
+- `name` (string, até 100 caracteres): Nome do produto
+- `description` (text): Descrição do produto (opcional)
+- `price` (decimal): Preço do produto
+- `available` (boolean): Disponibilidade (padrão: true)
+- `createdAt` (Date): Data de criação
+- `updatedAt` (Date): Data de última atualização
+
+### Order
+Pedidos realizados pelos clientes.
+
+**Enum OrderStatus:**
+- `CREATED`: Pedido criado
+- `CONFIRMED`: Pedido confirmado
+- `DELIVERING`: Em entrega
+- `FINISHED`: Finalizado
+- `CANCELED`: Cancelado
+
+**Campos:**
+- `id` (number): Identificador único
+- `items` (JSON): Array de itens do pedido com os seguintes campos:
+  - `productId` (number): ID do produto
+  - `name` (string): Nome do produto
+  - `price` (number): Preço unitário
+  - `quantity` (number): Quantidade
+  - `observations` (string): Observações (opcional)
+- `total` (decimal): Valor total do pedido
+- `status` (enum OrderStatus): Status do pedido (padrão: CREATED)
+- `client` (User): Cliente que realizou o pedido (relacionamento ManyToOne)
+- `restaurant` (User): Restaurante responsável (relacionamento ManyToOne)
+- `createdAt` (Date): Data de criação
+- `updatedAt` (Date): Data de última atualização
+
+### UsuarioLogin
+DTO utilizado para autenticação.
+
+**Campos:**
+- `email` (string): Email do usuário
+- `password` (string): Senha do usuário
+
+## �🔧 Tecnologias
 
 - **Framework**: NestJS
 - **ORM**: TypeORM
@@ -169,39 +230,18 @@ O sistema usa duas estratégias de autenticação:
 - Token JWT para requisições autenticadas
 - Validação via guards
 
-## 📚 Endpoints Principais
+## 📚 API Documentation
 
-### Autenticação
-- `POST /auth/login` - Login
-- `POST /auth/register` - Registro
+A documentação completa da API está disponível através do Swagger:
 
-### Usuários
-- `GET /user` - Listar usuários
-- `POST /user` - Criar usuário
-- `GET /user/:id` - Obter usuário
-- `PATCH /user/:id` - Atualizar usuário
-- `DELETE /user/:id` - Deletar usuário
+👉 **[Swagger UI - Garçon Delivery API](https://garcon-delivery.onrender.com/swagger#/)**
 
-### Produtos
-- `GET /product` - Listar produtos
-- `POST /product` - Criar produto
-- `GET /product/:id` - Obter produto
-- `PATCH /product/:id` - Atualizar produto
-- `DELETE /product/:id` - Deletar produto
-
-### Pedidos
-- `GET /order` - Listar pedidos
-- `POST /order` - Criar pedido
-- `GET /order/:id` - Obter pedido
-- `PATCH /order/:id` - Atualizar pedido
-- `DELETE /order/:id` - Deletar pedido
-
-## 🤝 Contribuindo
-
-1. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-2. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-3. Push para a branch (`git push origin feature/AmazingFeature`)
-4. Abra um Pull Request
+Aqui você encontrará:
+- ✅ Todas as entidades e seus campos
+- ✅ Todos os DTOs (Data Transfer Objects)
+- ✅ Todos os endpoints disponíveis
+- ✅ Descrição de parâmetros e respostas
+- ✅ Interface interativa para testar a API
 
 ## 📄 Licença
 
