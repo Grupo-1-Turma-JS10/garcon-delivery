@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "../../user/entities/user.entity";
 
@@ -8,7 +8,7 @@ export class Product {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ApiProperty({ example: 1, description: "ID of the restaurant that offers this product" })
+    @ApiProperty({ example: User, description: "Restaurant that offers this product" })
     @ManyToOne(() => User)
     restaurant: User;
 
@@ -35,4 +35,8 @@ export class Product {
     @ApiProperty({ example: "2023-01-01T00:00:00Z", description: "Date when the product was created" })
     @CreateDateColumn()
     createdAt: Date;
+
+    @ApiProperty({ example: "2023-01-01T01:00:00Z", description: "Date when the product was last updated" })
+    @UpdateDateColumn()
+    updatedAt: Date;
 }

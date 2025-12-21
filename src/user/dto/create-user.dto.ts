@@ -9,6 +9,11 @@ export class CreateUserDto {
     @MinLength(3)
     name: string;
 
+    @ApiProperty({ example: "12345678900", description: "Document number of the user. CPF or CNPJ" })
+    @IsNotEmpty()
+    @IsString()
+    document: string;
+
     @ApiProperty({ example: "john.doe@example.com", description: "Email address of the user" })
     @IsNotEmpty()
     @IsEmail()

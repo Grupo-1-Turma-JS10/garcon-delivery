@@ -25,18 +25,10 @@ export class Order {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ApiProperty({ example: 1, description: "ID of the client user" })
-    @ManyToOne(() => User)
-    client: User;
-
-    @ApiProperty({ example: 2, description: "ID of the restaurant user" })
-    @ManyToOne(() => User)
-    restaurant: User;
-
     @ApiProperty({
         example: [
-            { productId: 1, name: "Burguer", price: 25.50, quantity: 2 },
-            { productId: 2, name: "Coca Cola", price: 8.00, quantity: 2 },
+            { productId: 1, name: "Burguer", price: 25.50, quantity: 2, observations: "No onions, please." },
+            { productId: 2, name: "Coca Cola", price: 8.00, quantity: 2, observations: "Extra ice." },
         ],
         description: "Items included in this order",
     })
@@ -60,6 +52,14 @@ export class Order {
         default: OrderStatus.CREATED,
     })
     status: OrderStatus;
+
+    @ApiProperty({ example: User, description: "Client user" })
+    @ManyToOne(() => User)
+    client: User;
+
+    @ApiProperty({ example: User, description: "Restaurant user" })
+    @ManyToOne(() => User)
+    restaurant: User;
 
     @ApiProperty({ example: "2023-01-01T00:00:00Z", description: "Date when the order was created" })
     @CreateDateColumn()
