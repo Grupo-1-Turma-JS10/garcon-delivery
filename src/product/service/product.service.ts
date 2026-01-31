@@ -92,6 +92,8 @@ export class ProductService {
                 description: dto.description,
                 price: dto.price,
                 available: dto.available ?? true,
+                category: dto.category,
+                imageUrl: dto.imageUrl,
                 restaurant,
             });
 

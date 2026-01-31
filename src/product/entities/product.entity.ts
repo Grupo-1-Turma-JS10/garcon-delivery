@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "../../user/entities/user.entity";
+import { IsNotEmpty } from "class-validator";
 
 @Entity('products')
 export class Product {
@@ -31,6 +32,14 @@ export class Product {
     @ApiProperty({ example: true, description: "Whether the product is available" })
     @Column({ default: true })
     available: boolean;
+
+    @ApiProperty({ example: "Fast Food", description: "Category of the product" })
+    @Column({ length: 50, nullable: false })
+    category: string;
+
+    @ApiProperty({ example: "http://example.com/image.jpg", description: "URL of the product image", required: false })
+    @Column({ type: 'text', nullable: true })
+    imageUrl?: string;
 
     @ApiProperty({ example: "2023-01-01T00:00:00Z", description: "Date when the product was created" })
     @CreateDateColumn()
