@@ -25,4 +25,15 @@ export class UpdateProductDto {
     @IsOptional()
     @IsBoolean()
     available?: boolean;
+
+    @ApiProperty({ example: "Fast Food", description: "Category of the product", required: false })
+    @IsOptional()
+    @IsString()
+    @MinLength(3)
+    category?: string;
+
+    @ApiProperty({ example: "http://example.com/image.jpg", description: "URL of the product image", required: false })
+    @IsOptional()
+    @IsString()
+    imageUrl?: string;
 }

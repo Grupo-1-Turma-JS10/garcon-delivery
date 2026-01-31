@@ -30,4 +30,15 @@ export class CreateProductDto {
     @IsOptional()
     @IsBoolean()
     available?: boolean = true;
+
+    @ApiProperty({ example: "Fast Food", description: "Category of the product" })
+    @IsNotEmpty()
+    @IsString()
+    @MinLength(3)
+    category: string;
+
+    @ApiProperty({ required: false, example: "http://example.com/image.jpg", description: "URL of the product image" })
+    @IsNotEmpty()
+    @IsString()
+    imageUrl?: string;
 }
