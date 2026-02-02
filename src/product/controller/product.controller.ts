@@ -8,13 +8,13 @@ import { JwtAuthGuard } from "../../auth/guard/jwt-auth-guard";
 
 
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @ApiTags('Product')
 @Controller('/product')
 export class ProductController {
     constructor(private readonly productService: ProductService) { }
 
     @Post()
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Create a new product' })
     @ApiResponse({ status: 201, description: 'The product has been successfully created.', type: Product })
     @HttpCode(HttpStatus.CREATED)
@@ -46,6 +46,14 @@ export class ProductController {
         return this.productService.findByName(name);
     }
 
+    @Get('/category/:category')
+    @ApiOperation({ summary: 'Retrieve products by category' })
+    @ApiResponse({ status: 200, description: 'List of products matching the category', type: [Product] })
+    @HttpCode(HttpStatus.OK)
+    findByCategory(@Param('category') category: string): Promise<Product[]> {
+        return this.productService.findByCategory(category);
+    }
+
     @Get('/available')
     @ApiOperation({ summary: 'Retrieve available products' })
     @ApiResponse({ status: 200, description: 'List of available products', type: [Product] })
@@ -63,6 +71,7 @@ export class ProductController {
     }
 
     @Put('/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Update an existing product' })
     @ApiResponse({ status: 200, description: 'The product has been successfully updated.', type: Product })
     @HttpCode(HttpStatus.OK)
@@ -71,6 +80,7 @@ export class ProductController {
     }
 
     @Delete('/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Delete a product by its ID' })
     @ApiResponse({ status: 204, description: 'The product has been successfully deleted.' })
     @HttpCode(HttpStatus.NO_CONTENT)

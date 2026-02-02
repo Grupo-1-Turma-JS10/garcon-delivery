@@ -49,6 +49,17 @@ export class ProductService {
         });
     }
 
+    async findByCategory(category: string): Promise<Product[]> {
+        return await this.productRepository.find({
+            where: {
+                category: ILike(`%${category}%`)
+            },
+            relations: {
+                restaurant: true,
+            }
+        });
+    }
+
     async findByRestaurantId(restaurantId: number): Promise<Product[]> {
         this.logger.log(`Finding products for restaurant: ${restaurantId}`);
 
