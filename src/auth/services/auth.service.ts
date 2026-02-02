@@ -56,6 +56,7 @@ export class AuthService {
                 username: user?.name,
                 email: user?.email,
                 token: `Bearer ${signedToken}`,
+                role: user?.role
             };
         } catch (error) {
             throw new InternalServerErrorException('Error generating token');
