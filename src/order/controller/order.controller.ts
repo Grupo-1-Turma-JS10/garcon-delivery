@@ -70,11 +70,11 @@ export class OrderController {
         return this.orderService.update(id, order);
     }
 
-    @Delete('/:id')
-    @ApiOperation({ summary: 'Delete an order by its ID' })
-    @ApiResponse({ status: 204, description: 'The order has been successfully deleted.' })
-    @HttpCode(HttpStatus.NO_CONTENT)
-    delete(@Param('id', ParseIntPipe) id: number) {
-        return this.orderService.delete(id);
+    @Put('/cancel/:id')
+    @ApiOperation({ summary: 'Cancel an order by its ID' })
+    @ApiResponse({ status: 200, description: 'The order has been successfully canceled.', type: Order })
+    @HttpCode(HttpStatus.OK)
+    cancel(@Param('id', ParseIntPipe) id: number): Promise<Order> {
+        return this.orderService.cancel(id);
     }
 }
