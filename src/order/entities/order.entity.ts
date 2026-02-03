@@ -2,20 +2,21 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Up
 import { User } from "../../user/entities/user.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber } from "class-validator";
+import { Product } from "../../product/entities/product.entity";
 
 export enum OrderStatus {
     CREATED = 'CREATED',
     CONFIRMED = 'CONFIRMED',
     DELIVERING = 'DELIVERING',
+    PREPARING = 'PREPARING',
     FINISHED = 'FINISHED',
     CANCELED = 'CANCELED',
 }
 
 export interface OrderItem {
-    productId: number;
-    name: string;
-    price: number;
+    product: Product;
     quantity: number;
+    price: number;
     observations?: string;
 }
 

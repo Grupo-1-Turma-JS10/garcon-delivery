@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Order, OrderItem, OrderStatus } from "../entities/order.entity";
-import { DeleteResult, Repository, UpdateResult } from "typeorm";
+import { Repository, UpdateResult } from "typeorm";
 import { CreateOrderDto, OrderItemDto } from "../dto/create-order.dto";
 import { UserService } from "../../user/service/user.service";
 import { UpdateOrderDto } from "../dto/update-order.dto";
@@ -126,10 +126,20 @@ export class OrderService {
 
     async update(id: number, dto: UpdateOrderDto): Promise<Order> {
         try {
-            await this.findById(id);
+            const order = await this.findById(id);
+
+            let validatedItems: OrderItem[] = order.items;
+            if (dto.items && dto.items.length > 0) {
+                validatedItems = await this.validateProductsInOrder(
+                    dto.items, order.restaurant.id
+                );
+            }
+
+            const calculatedTotal = this.caulculateTotal(validatedItems);
 
             const result: UpdateResult = await this.orderRepository.update(id, {
-                items: dto.items,
+                items: validatedItems,
+                total: parseFloat(calculatedTotal.toFixed(2)),
                 status: dto.status,
             });
 
@@ -146,9 +156,18 @@ export class OrderService {
         }
     }
 
-    async delete(id: number): Promise<DeleteResult> {
-        await this.findById(id);
-        return await this.orderRepository.delete(id);
+    async cancel(id: number): Promise<Order> {
+        const order = await this.findById(id);
+
+        const result: UpdateResult = await this.orderRepository.update(id, {
+            status: OrderStatus.CANCELED,
+        });
+
+        if (result.affected === 0) {
+            throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
+        }
+
+        return await this.findById(id);
     }
 
     async validateProductsInOrder(items: OrderItemDto[], restaurantId: number): Promise<OrderItem[]> {
@@ -175,10 +194,9 @@ export class OrderService {
             }
 
             const validatedItem: OrderItem = {
-                productId: product.id,
-                name: product.name,
-                price: parseFloat(product.price.toString()),
+                product: product,
                 quantity: item.quantity,
+                price: product.price,
                 observations: item.observations,
             };
 
@@ -211,6 +229,6 @@ export class OrderService {
 
     caulculateTotal(items: OrderItem[]): number {
         this.logger.log(`Calculating total for order with ${items.length} items`);
-        return items.reduce((total, item) => total + item.price * item.quantity, 0);
+        return items.reduce((total, item) => total + item.product.price * item.quantity, 0);
     }
 }
