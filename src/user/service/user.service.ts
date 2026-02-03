@@ -1,6 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DeleteResult, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { User } from "../entities/user.entity";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
@@ -92,9 +92,11 @@ export class UserService {
     return plainToClass(User, salvo);
   }
 
-  async delete(id: number): Promise<DeleteResult> {
-    await this.findById(id);
+  async delete(id: number): Promise<User> {
+    const usuario = await this.findById(id);
 
-    return await this.userRepository.delete(id);
+    usuario.active = false;
+    const usuarioDesativado = await this.userRepository.save(usuario);
+    return plainToClass(User, usuarioDesativado);
   }
 }
