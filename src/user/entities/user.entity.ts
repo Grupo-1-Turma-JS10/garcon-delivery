@@ -49,6 +49,10 @@ export class User {
     })
     @Column({ length: 255, nullable: true })
     address?: string;
+
+    @ApiProperty({ example: true, description: "Indicates if the user is active" })
+    @Column({ default: true })
+    active: boolean;
  
     @ApiProperty({ example: "2023-01-01T00:00:00Z", description: "Date when the user was created" })
     @CreateDateColumn()

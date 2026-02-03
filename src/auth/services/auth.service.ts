@@ -4,6 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import { BcryptService } from "../bcrypt/bcrypt";
 import { UsuarioLogin } from "../entities/usuariologin.entity";
 import { User } from "../../user/entities/user.entity";
+import { LoginResponseDTO } from "../dto/LoginResponseDTO";
 
 @Injectable()
 export class AuthService {
@@ -53,12 +54,13 @@ export class AuthService {
             const signedToken = this.jwtService.sign(payload);
 
             return {
-                username: user?.name,
+                name: user?.name,
                 email: user?.email,
                 token: `Bearer ${signedToken}`,
                 role: user?.role,
-                id: user?.id
-            };
+                id: user?.id,
+                active: user?.active,
+            } as LoginResponseDTO;
         } catch (error) {
             throw new InternalServerErrorException('Error generating token');
         }
