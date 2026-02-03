@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
+import { IsStrongPassword } from "class-validator";
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -26,6 +27,8 @@ export class User {
     email: string;
 
     @Exclude()
+    @IsStrongPassword()
+    @ApiProperty({ example: "strongPassword123!", description: "User password" })
     @Column({ length: 255, nullable: false })
     password: string;
  
