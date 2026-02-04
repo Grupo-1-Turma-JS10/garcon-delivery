@@ -60,6 +60,8 @@ export class AuthService {
                 role: user?.role,
                 id: user?.id,
                 active: user?.active,
+                document: user?.document,
+                address: user?.address,
             } as LoginResponseDTO;
         } catch (error) {
             throw new InternalServerErrorException('Error generating token');

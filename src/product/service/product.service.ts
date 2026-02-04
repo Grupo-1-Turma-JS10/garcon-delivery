@@ -83,6 +83,18 @@ export class ProductService {
         }
     }
 
+    async findByRestaurantIdAndCategory(restaurantId: number, category: string): Promise<Product[]> {
+        return await this.productRepository.find({
+            where: {
+                restaurant: { id: restaurantId },
+                category: ILike(`%${category}%`)
+            },
+            relations: {
+                restaurant: true,
+            }
+        });
+    }
+
     async findAvailable(): Promise<Product[]> {
         return await this.productRepository.find({
             where: {

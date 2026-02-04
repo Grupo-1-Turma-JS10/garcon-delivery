@@ -30,6 +30,14 @@ export class ProductController {
         return this.productService.findAll();
     }
 
+    @Get('/restaurant/:restaurantId/category/:category')
+    @ApiOperation({ summary: 'Retrieve products by restaurant and category' })
+    @ApiResponse({ status: 200, description: 'List of products for the specified restaurant and category', type: [Product] })
+    @HttpCode(HttpStatus.OK)
+    findByRestaurantIAndCategorytegory(@Param('restaurantId', ParseIntPipe) restaurantId: number, @Param('category') category: string): Promise<Product[]> {
+        return this.productService.findByRestaurantIdAndCategory(restaurantId, category);
+    }
+
     @Get('/restaurant/:restaurantId')
     @ApiOperation({ summary: 'Retrieve products by restaurant' })
     @ApiResponse({ status: 200, description: 'List of products for the specified restaurant', type: [Product] })
