@@ -96,7 +96,7 @@ export class UserService {
     return plainToClass(User, salvo);
   }
 
-  async delete(id: number): Promise<User> {
+  async desableUser(id: number): Promise<User> {
     const usuario = await this.findById(id);
 
     usuario.active = false;

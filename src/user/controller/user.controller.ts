@@ -48,11 +48,11 @@ export class UserController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete('/:id')
-    @ApiOperation({ summary: 'Delete a user by its ID' })
-    @ApiResponse({ status: 204, description: 'The user has been successfully deleted.' })
+    @Put('/:id/disable')
+    @ApiOperation({ summary: 'Disable a user by its ID' })
+    @ApiResponse({ status: 204, description: 'The user has been successfully disabled.' })
     @HttpCode(HttpStatus.NO_CONTENT)
-    delete(@Param('id', ParseIntPipe) id: number) {
-        return this.userService.delete(id);
+    disable(@Param('id', ParseIntPipe) id: number) {
+        return this.userService.desableUser(id);
     }
 }
