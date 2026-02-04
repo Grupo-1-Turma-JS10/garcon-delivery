@@ -23,6 +23,9 @@ export class LoginResponseDTO {
     })
     address?: string;
 
+    @ApiProperty({ example: "12345678900", description: "Document number of the user. CPF or CNPJ" })
+    document: string;
+
     @ApiProperty({ example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", description: "JWT token for authentication" })
     token: string;
 

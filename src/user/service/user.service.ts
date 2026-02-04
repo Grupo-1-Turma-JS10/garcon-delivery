@@ -82,11 +82,15 @@ export class UserService {
       throw new HttpException('Email já cadastrado para outro usuário!', HttpStatus.BAD_REQUEST);
     }
 
-    const usuarioAtualizado = {
+    let usuarioAtualizado: any = {
       ...usuarioExistente,
       ...user,
       id
     };
+
+    if (user.password) {
+      usuarioAtualizado.password = await this.bcrypt.hashPassword(user.password);
+    }
 
     const salvo = await this.userRepository.save(usuarioAtualizado);
     return plainToClass(User, salvo);

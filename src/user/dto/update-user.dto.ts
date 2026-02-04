@@ -6,7 +6,7 @@ export class UpdateUserDto {
     @IsOptional()
     @IsString()
     @MinLength(3)
-    username?: string;
+    name?: string;
 
     @ApiProperty({ example: "12345678900", description: "Document number of the user. CPF or CNPJ", required: false })
     @IsOptional()
@@ -17,6 +17,12 @@ export class UpdateUserDto {
     @IsOptional()
     @IsEmail()
     email?: string;
+
+    @ApiProperty({ example: "password123", description: "Password of the user", required: false })
+    @IsOptional()
+    @IsString()
+    @MinLength(6)
+    password?: string;
 
     @ApiProperty({ example: "Rua das Flores, 123, São Paulo, SP", description: "Address of the user", required: false })
     @IsOptional()
