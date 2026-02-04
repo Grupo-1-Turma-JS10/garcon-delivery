@@ -124,6 +124,8 @@ export class ProductService {
                 description: dto.description,
                 price: dto.price,
                 available: dto.available,
+                category: dto.category,
+                imageUrl: dto.imageUrl,
             });
 
             if (result.affected === 0) {
